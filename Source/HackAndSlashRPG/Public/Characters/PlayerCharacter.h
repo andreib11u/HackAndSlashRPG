@@ -1,4 +1,4 @@
-// Copyright 2021 Andrey Bondarenko. All right reserved
+// Copyright 2021 Andrey Bondarenko. All rights reserved
 
 #pragma once
 

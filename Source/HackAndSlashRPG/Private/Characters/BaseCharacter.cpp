@@ -1,7 +1,8 @@
-// Copyright 2021 Andrey Bondarenko. All right reserved
+// Copyright 2021 Andrey Bondarenko. All rights reserved
 
 
 #include "Characters/BaseCharacter.h"
+#include "HackAndSlashRPG/Public/Components/CommandExecutorComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -9,6 +10,7 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	CommandExecutor = CreateDefaultSubobject<UCommandExecutorComponent>(TEXT("CommandExecutor"));
 }
 
 // Called when the game starts or when spawned

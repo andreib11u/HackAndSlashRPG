@@ -1,4 +1,4 @@
-// Copyright 2021 Andrey Bondarenko. All right reserved
+// Copyright 2021 Andrey Bondarenko. All rights reserved
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+class UCommandExecutorComponent;
 /**
  * Base rpg character
  */
@@ -21,9 +22,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UCommandExecutorComponent* GetCommandExecutorComponent()const { return CommandExecutor; }
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	UCommandExecutorComponent* CommandExecutor;
 };
