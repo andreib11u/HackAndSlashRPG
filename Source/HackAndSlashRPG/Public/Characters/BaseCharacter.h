@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2021 Andrey Bondarenko. All right reserved
 
 #pragma once
 
@@ -6,7 +6,10 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
-UCLASS()
+/**
+ * Base rpg character
+ */
+UCLASS(Abstract)
 class HACKANDSLASHRPG_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
