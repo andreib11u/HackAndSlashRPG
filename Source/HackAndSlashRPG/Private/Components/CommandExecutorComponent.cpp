@@ -18,9 +18,20 @@ UCommandExecutorComponent::UCommandExecutorComponent()
 
 void UCommandExecutorComponent::ExecuteCommand(UCommand* CommandToExecute)
 {
+	if (CurrentCommand)
+	{
+		CurrentCommand->EndExecute();
+	}
+	CurrentCommand = CommandToExecute;
+	CurrentCommand->OnEndExecute.AddLambda([this]() { CurrentCommand = nullptr; });
 	CommandToExecute->TryExecute();
+
 }
 
+void UCommandExecutorComponent::AddToBuffer(UCommand* Command)
+{
+	Buffer = Command;
+}
 
 // Called when the game starts
 void UCommandExecutorComponent::BeginPlay()
@@ -28,9 +39,8 @@ void UCommandExecutorComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CastedOwner = Cast<ABaseCharacter>(GetOwner());
-	
-}
 
+}
 
 // Called every frame
 void UCommandExecutorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -38,5 +48,19 @@ void UCommandExecutorComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UCommandExecutorComponent::ExecuteBufferChecked()
+{
+	if (Buffer)
+	{
+		ExecuteCommand(Buffer);
+		ClearBuffer();
+	}
+}
+
+void UCommandExecutorComponent::ClearBuffer()
+{
+	Buffer = nullptr;
 }
 

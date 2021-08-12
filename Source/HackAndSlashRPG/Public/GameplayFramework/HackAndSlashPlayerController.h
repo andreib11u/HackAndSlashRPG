@@ -15,5 +15,8 @@ class HACKANDSLASHRPG_API AHackAndSlashPlayerController : public APlayerControll
 	GENERATED_BODY()
 public:
 	virtual void SetupInputComponent() override;
+	
 	void SetDestination();
+protected:
+	virtual void BeginPlay() override;
 };

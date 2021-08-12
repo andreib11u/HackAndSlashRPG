@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "HackAndSlashRPG/Public/Characters/BaseCharacter.h"
+#include "Navigation/PathFollowingComponent.h"
 
 void UMoveCommand::Init(FVector DestinationToSet, ABaseCharacter* OwnerToSet)
 {
@@ -18,9 +19,30 @@ void UMoveCommand::Init(FVector DestinationToSet, ABaseCharacter* OwnerToSet)
 	}
 }
 
+void UMoveCommand::Init(AActor* DestinationToSet, ABaseCharacter* OwnerToSet)
+{
+	SetOwner(OwnerToSet);
+	DestinationActor = DestinationToSet;
+	PathFollowingComponent = GetPathFollowingComponent(*GetOwner()->GetController());
+
+	if (PathFollowingComponent)
+	{
+		OnPathCompleteHandle = PathFollowingComponent->OnRequestFinished.AddUObject(this, &UMoveCommand::OnPathComplete);
+	}
+}
+
 void UMoveCommand::Execute()
 {
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetOwner()->GetController(), Destination);
+	OnStartExecute.Broadcast();
+	if (DestinationActor)
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToActor(GetOwner()->GetController(), DestinationActor);
+	}
+	else
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetOwner()->GetController(), Destination);
+	}
+	
 }
 
 bool UMoveCommand::CanExecute()
@@ -31,6 +53,7 @@ bool UMoveCommand::CanExecute()
 void UMoveCommand::EndExecute()
 {
 	PathFollowingComponent->OnRequestFinished.Remove(OnPathCompleteHandle);
+	OnEndExecute.Broadcast();
 }
 
 UPathFollowingComponent* UMoveCommand::GetPathFollowingComponent(AController& Controller)

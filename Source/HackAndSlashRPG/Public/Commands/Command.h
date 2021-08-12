@@ -6,6 +6,9 @@
 #include "UObject/NoExportTypes.h"
 #include "Command.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnEndExecute);
+DECLARE_MULTICAST_DELEGATE(FOnStartExecute);
+
 class ABaseCharacter;
 /**
  * Make owner do actions
@@ -45,6 +48,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	virtual void EndExecute();
+
+	FOnEndExecute OnEndExecute;
+	FOnStartExecute OnStartExecute;
 	
 	ABaseCharacter* GetOwner()const { return Owner; }
 	void SetOwner(ABaseCharacter* OwnerToSet) { Owner = OwnerToSet; }
