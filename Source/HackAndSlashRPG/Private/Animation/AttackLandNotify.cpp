@@ -12,6 +12,7 @@ void UAttackLandNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 	auto Owner = Cast<ABaseCharacter>(MeshComp->GetOwner());
 	if (Owner)
 	{
+		Owner->SetLockedInAnimation(false);
 		Owner->OnAttackLand.Broadcast();
 	}
 }

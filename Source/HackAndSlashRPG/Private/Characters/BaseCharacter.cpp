@@ -3,8 +3,9 @@
 
 #include "Characters/BaseCharacter.h"
 
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Components/AbilityComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "HackAndSlashRPG/Public/Components/CommandExecutorComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -14,7 +15,7 @@ ABaseCharacter::ABaseCharacter()
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
-	CommandExecutor = CreateDefaultSubobject<UCommandExecutorComponent>(TEXT("CommandExecutor"));
+	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
 }
 
 void ABaseCharacter::StartRotating(AActor* Target, bool StopWhenFaceTarget)
@@ -34,14 +35,59 @@ void ABaseCharacter::EndRotating()
 	OnRotationEnd.Broadcast();
 }
 
-// Called when the game starts or when spawned
+void ABaseCharacter::StartAttackCooldown()
+{
+	if (GetWorld())
+	{
+		bIsAttackInCooldown = true;
+		GetWorld()->GetTimerManager().SetTimer(AttackCooldownTimerHandle,this, &ABaseCharacter::OnAttackCooldownExpired, InternalStats.AttackCooldown);
+	}
+}
+
+void ABaseCharacter::PlayAttackMontage()
+{
+	UAnimMontage* AttackMontage = GetRandomAttackMontage();
+	const float Length = AttackMontage->CalculateSequenceLength();
+
+	const float Rate = Length / InternalStats.AttackCooldown; // Make montage play as fast as AttackCooldown expires
+	
+	PlayAnimMontage(AttackMontage, Rate);
+}
+
+bool ABaseCharacter::CanMove()
+{
+	return !IsLockedInAnimation();
+}
+
+void ABaseCharacter::MoveTo(const FVector Location)
+{
+	if (CanMove())
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Location);
+	}
+}
+
+void ABaseCharacter::StopMoving()
+{
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
+void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	}
+}
+
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -55,5 +101,10 @@ void ABaseCharacter::Tick(float DeltaTime)
 			EndRotating();
 		}
 	}
+}
+
+void ABaseCharacter::OnAttackCooldownExpired()
+{
+	bIsAttackInCooldown = false;
 }
 
