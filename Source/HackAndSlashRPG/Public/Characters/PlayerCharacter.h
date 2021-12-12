@@ -6,24 +6,9 @@
 #include "Characters/BaseCharacter.h"
 #include "PlayerCharacter.generated.h"
 
+class UAttributesComponent;
 class UCameraComponent;
 class USpringArmComponent;
-
-USTRUCT(BlueprintType)
-struct FAttributes
-{
-	GENERATED_BODY()
-
-	int32 Strength = 10;
-	int32 Agility = 10;
-	int32 Intelligence = 10;
-	int32 Vitality = 10;
-
-	int32 HpPerVitality = 11;
-	int32 MpPerIntelligence = 3;
-	float DmgPerStrength = 0.8f;
-	float CooldownReductionPerAgility = 0.01f;
-};
 
 /**
  * 
@@ -36,11 +21,25 @@ public:
 	APlayerCharacter();
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitProperties() override;
+
+	struct FAttributes GetAttributes()const;
+	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowProtectedAccess = "true"))
-	FAttributes Attributes;
+	
 private:
-	void ApplyAttributes();
+	UFUNCTION()
+	void OnStrengthChange(int32 Change);
+	UFUNCTION()
+	void OnAgilityChange(int32 Change);
+	UFUNCTION()
+	void OnIntelligenceChange(int32 Change);
+	UFUNCTION()
+	void OnVitalityChange(int32 Change);
+
+	void ConfigureAttributeComponent();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes", meta = (AllowPrivateAccess = "true"))
+	UAttributesComponent* AttributesComponent;
 	
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;

@@ -12,7 +12,7 @@ UBasicAttack::UBasicAttack()
 
 void UBasicAttack::Execute()
 {
-	Owner->StartRotating(TargetCharacter);
+	Owner->StartRotating(TargetCharacter->GetActorLocation());
 	
 	Owner->SetLockedInAnimation(true); // Unlock happens in AnimNotify when the attack "lands" on an enemy
 	
@@ -31,7 +31,7 @@ bool UBasicAttack::CanExecute()
 		return false;
 	}
 
-	if (Owner->IsAttackInCooldown())
+	if (Owner->IsAttackInCooldown() || Owner->IsLockedInAnimation())
 	{
 		return false;
 	}

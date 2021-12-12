@@ -2,14 +2,12 @@
 
 
 #include "GameplayFramework/HackAndSlashPlayerController.h"
-
 #include "Abilities/BasicAttack.h"
 #include "Characters/BaseCharacter.h"
 #include "Characters/EnemyCharacter.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/AbilityComponent.h"
 #include "Navigation/PathFollowingComponent.h"
-
 
 void AHackAndSlashPlayerController::SetupInputComponent()
 {
@@ -22,13 +20,12 @@ void AHackAndSlashPlayerController::SetupInputComponent()
 void AHackAndSlashPlayerController::SetDestination()
 {
 	bIsDestinationSet = true;
-	UnqueueAttack();
 }
 
 void AHackAndSlashPlayerController::UnsetDestination()
 {
 	bIsDestinationSet = false;
-	SetEnemy(nullptr);
+	UnsetEnemy();
 }
 
 void AHackAndSlashPlayerController::FindPathFollowingComponent()
@@ -85,77 +82,6 @@ void AHackAndSlashPlayerController::Tick(float DeltaSeconds)
 			}
 		}
 	}
-
-	//if (CommandExecutorComponent && bIsDestinationSet)
-	//{
-	//	if (Enemy)
-	//	{
-	//		if (!ControlledCharacter->IsAttackInCooldown())
-	//		{
-	//			// check range to target
-	//			const float Distance = FVector::Distance(GetPawn()->GetActorLocation(), Enemy->GetActorLocation());
-	//			if (Distance < ControlledCharacter->GetStartingAttackDistance())
-	//			{
-	//				auto Attack = NewObject<UAttackCommand>();
-	//				Attack->Init(ControlledCharacter, Enemy);
-	//				CommandExecutorComponent->ExecuteCommand(Attack);
-	//			}
-	//			else
-	//			{
-	//				auto MoveCommand = NewObject<UMoveCommand>();
-	//				MoveCommand->Init(Enemy, ControlledCharacter);
-	//				CommandExecutorComponent->ExecuteCommand(MoveCommand);
-	//				QueueAttack(Enemy);
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		FHitResult OutHit;
-	//		if (GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, OutHit))
-	//		{
-	//			Enemy = Cast<AEnemyCharacter>(OutHit.GetActor());
-	//			if (Enemy)
-	//			{
-	//				return;
-	//			}
-	//			auto MoveCommand = NewObject<UMoveCommand>();
-	//			MoveCommand->Init(OutHit.Location, ControlledCharacter);
-	//			CommandExecutorComponent->ExecuteCommand(MoveCommand);
-
-	//		}
-	//	}
-	//}
-
-	//if (bIsAttackQueued)
-	//{
-	//	if (QueuedEnemy)
-	//	{
-	//		const float Distance = FVector::Distance(GetPawn()->GetActorLocation(), QueuedEnemy->GetActorLocation());
-	//		if (Distance < ControlledCharacter->GetStartingAttackDistance())
-	//		{
-	//			AbortMove();
-	//			
-	//			auto Attack = NewObject<UAttackCommand>();
-	//			Attack->Init(ControlledCharacter, QueuedEnemy);
-	//			CommandExecutorComponent->ExecuteCommand(Attack);
-	//			UnqueueAttack();
-	//		}
-	//	}
-	//}
-}
-
-void AHackAndSlashPlayerController::QueueAttack(ABaseCharacter* EnemyToAttack)
-{
-	bIsAttackQueued = true;
-	QueuedEnemy = EnemyToAttack;
-}
-
-
-void AHackAndSlashPlayerController::UnqueueAttack()
-{
-	bIsAttackQueued = false;
-	QueuedEnemy = nullptr;
 }
 
 void AHackAndSlashPlayerController::AbortMove()

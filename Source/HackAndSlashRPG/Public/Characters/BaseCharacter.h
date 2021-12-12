@@ -5,54 +5,21 @@
 #include "CoreMinimal.h"
 
 #include "Components/AbilityComponent.h"
+#include "Components/StatsComponent.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
+
+class UStatsComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRotationEnd);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackLand);
 
-class UCommandExecutorComponent;
-
+/** Info required for rotation */
 struct FRotationState
 {
 	FRotator Target;
 	bool bEndWhenFaceTarget;
-};
-
-USTRUCT(BlueprintType)
-struct FInternalStats
-{
-	GENERATED_BODY()
-
-	int32 Health;
-	int32 MaxHealth = 100;
-	
-	int32 Mana;
-	int32 MaxMana = 30;
-
-	float AttackCooldown = 1.f;
-	float MinAttackCooldown = 0.25f;
-
-	float Damage = 10.f;
-	
-	float DamageMultiplier = 1.f;
-	float MinDamageMultiplier = 0.1f;
-
-	float DefenseMultiplier = 0.f;
-	float MinDefenseMultiplier = 0.f;
-	float MaxDefenseMultiplier = 0.85f;
-
-	FInternalStats()
-	{
-		Health = MaxHealth;
-		Mana = MaxMana;
-	}
-
-	static FInternalStats GetDefaultStats()
-	{
-		static FInternalStats DefaultStats = FInternalStats();
-		return DefaultStats;
-	}
+	float Speed;
 };
 
 /**
@@ -64,24 +31,25 @@ class HACKANDSLASHRPG_API ABaseCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+	// Sets default values for character's properties
 	ABaseCharacter();
-
-	/** Attack can be started at this distance */
-	float GetStartingAttackDistance()const { return MaxAttackDistance; }
-	
-	/** When attack lands target must be in this range */
-	float GetMaxReachAttackDistance()const { return MaxAttackDistance * 2.f; }
 
 	UAnimMontage* GetRandomAttackMontage() const { return AttackMontages[FMath::RandRange(0, AttackMontages.Num() - 1)]; }
 
 	bool IsLockedInAnimation()const { return bLockedInAnimation; }
 
+	/**
+	 * Rotate to face Target
+	 * @param Target - Location to face
+	 * @param RotationSpeed 
+	 * @param StopWhenFaceTarget - If true - stops rotating when faced target,
+	 * otherwise need to call StopRotating() to stop always looking at target
+	 */
 	UFUNCTION(BlueprintCallable)
-	void StartRotating(AActor* Target, bool StopWhenFaceTarget = true);
+	void StartRotating(const FVector Target, const float RotationSpeed = 650.f, bool StopWhenFaceTarget = true);
 
 	UFUNCTION(BlueprintCallable)
-	void EndRotating();
+	void StopRotating();
 
 	UFUNCTION(BlueprintCallable)
 	void StartAttackCooldown();
@@ -109,26 +77,32 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnAttackLand OnAttackLand;
 
+	UFUNCTION(BlueprintCallable)
+	FCharacterStats GetStats()const;
+
+	UFUNCTION(BlueprintCallable)
+	FCharacterStats GetBaseStats()const;
+
+	UStatsComponent* GetStatsComponent()const { return StatsComponent; }
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaTime) override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowProtectedAccess = "true"))
-	FInternalStats InternalStats;
+
 private:
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UAbilityComponent* AbilityComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UStatsComponent* StatsComponent;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CommonStats", meta = (AllowPrivateAccess = "true"))
-	float MaxAttackDistance = 150.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAbilityComponent* AbilityComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages", meta = (AllowPrivateAccess = "true"))
 	TArray<UAnimMontage*> AttackMontages;
 
-	UPROPERTY(VisibleAnywhere, Transient, Category="Rotation", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Transient, Category = "Rotation", meta = (AllowPrivateAccess = "true"))
 	bool bIsRotating;
-
+	
 	FRotationState RotationState;
 
 	FTimerHandle AttackCooldownTimerHandle;
@@ -136,11 +110,11 @@ private:
 	UFUNCTION()
 	void OnAttackCooldownExpired();
 	
-	/** Cannot start an attack when attack is in cooldown */
-	UPROPERTY(BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	/** Cannot start an attack when the attack is in cooldown */
+	UPROPERTY(BlueprintReadWrite, Transient, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	bool bIsAttackInCooldown;
 	
-	/** Cannot start other actions when locked in animation */
-	UPROPERTY(BlueprintReadWrite, Category = "Montages", meta = (AllowPrivateAccess = "true"))
+	/** Cannot start other actions when locked in an animation */
+	UPROPERTY(BlueprintReadWrite, Transient, Category = "Montages", meta = (AllowPrivateAccess = "true"))
 	bool bLockedInAnimation;
 };

@@ -22,7 +22,9 @@ class HACKANDSLASHRPG_API AHackAndSlashPlayerController : public APlayerControll
 	GENERATED_BODY()
 public:
 	virtual void SetupInputComponent() override;
-
+	
+	/** When destination is set, player is either moving to location at mouse cursor,
+	 *  or attacking enemy when enemy is set */
 	UFUNCTION(BlueprintCallable)
 	void SetDestination();
 
@@ -33,16 +35,13 @@ public:
 
 	void SetEnemy(ABaseCharacter* EnemyToSet) { Enemy = EnemyToSet; }
 	
+	/** Set Enemy to nullptr */
 	UFUNCTION(BlueprintCallable)
 	void UnsetEnemy();
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 private:
-	void QueueAttack(ABaseCharacter* EnemyToAttack);
-	void UnqueueAttack();
-
-
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UAbilityComponent* PlayerAbilityComponent;
 

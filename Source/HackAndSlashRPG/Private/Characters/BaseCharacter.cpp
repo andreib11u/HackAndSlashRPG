@@ -6,6 +6,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/AbilityComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StatsComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -16,19 +17,21 @@ ABaseCharacter::ABaseCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
+
+	StatsComponent = CreateDefaultSubobject<UStatsComponent>("CharacterStats");
 }
 
-void ABaseCharacter::StartRotating(AActor* Target, bool StopWhenFaceTarget)
+void ABaseCharacter::StartRotating(const FVector Target, const float RotationSpeed, bool StopWhenFaceTarget)
 {
 	bIsRotating = true;
 	
-	const FVector DiffVector = Target->GetActorLocation() - GetActorLocation();
+	const FVector DiffVector = Target - GetActorLocation();
 	const FRotator LookAtRotation = FRotator(0.f, DiffVector.Rotation().Yaw, 0.f);
 	
-	RotationState = FRotationState{ LookAtRotation, StopWhenFaceTarget };
+	RotationState = FRotationState{ LookAtRotation, StopWhenFaceTarget, RotationSpeed };
 }
 
-void ABaseCharacter::EndRotating()
+void ABaseCharacter::StopRotating()
 {
 	bIsRotating = false;
 	RotationState = FRotationState();
@@ -40,7 +43,7 @@ void ABaseCharacter::StartAttackCooldown()
 	if (GetWorld())
 	{
 		bIsAttackInCooldown = true;
-		GetWorld()->GetTimerManager().SetTimer(AttackCooldownTimerHandle,this, &ABaseCharacter::OnAttackCooldownExpired, InternalStats.AttackCooldown);
+		GetWorld()->GetTimerManager().SetTimer(AttackCooldownTimerHandle,this, &ABaseCharacter::OnAttackCooldownExpired, GetStats().AttackCooldown);
 	}
 }
 
@@ -49,8 +52,9 @@ void ABaseCharacter::PlayAttackMontage()
 	UAnimMontage* AttackMontage = GetRandomAttackMontage();
 	const float Length = AttackMontage->CalculateSequenceLength();
 
-	const float Rate = Length / InternalStats.AttackCooldown; // Make montage play as fast as AttackCooldown expires
-	
+	// Make montage length equal to AttackCooldown, so no matter how slow
+	// or fast animation is, it is always the same length
+	const float Rate = Length / GetStats().AttackCooldown;
 	PlayAnimMontage(AttackMontage, Rate);
 }
 
@@ -70,6 +74,16 @@ void ABaseCharacter::MoveTo(const FVector Location)
 void ABaseCharacter::StopMoving()
 {
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
+}
+
+FCharacterStats ABaseCharacter::GetStats() const
+{
+	return StatsComponent->GetStats();
+}
+
+FCharacterStats ABaseCharacter::GetBaseStats() const
+{
+	return StatsComponent->GetBaseStats();
 }
 
 void ABaseCharacter::BeginPlay()
@@ -94,11 +108,11 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 	if (bIsRotating)
 	{
-		const FRotator NextRotation = FMath::RInterpConstantTo(GetActorRotation(), RotationState.Target, DeltaTime, 650.f);
+		const FRotator NextRotation = FMath::RInterpConstantTo(GetActorRotation(), RotationState.Target, DeltaTime, RotationState.Speed);
 		SetActorRotation(NextRotation);
 		if (RotationState.bEndWhenFaceTarget && GetActorRotation().Equals(RotationState.Target, 0.001f))
 		{
-			EndRotating();
+			StopRotating();
 		}
 	}
 }
