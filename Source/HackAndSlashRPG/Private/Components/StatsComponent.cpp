@@ -23,7 +23,7 @@ void UStatsComponent::AddHealth(const float Health)
 
 	ApplyEffects();
 
-	OnHealthChange.Broadcast(CurrentStats.CurrentHealth);
+	OnHealthChange.Broadcast(CurrentStats.CurrentHealth, CurrentStats.MaxHealth);
 }
 
 void UStatsComponent::AddMana(const float Mana)
@@ -38,7 +38,7 @@ void UStatsComponent::AddMana(const float Mana)
 
 	ApplyEffects();
 
-	OnManaChange.Broadcast(CurrentStats.CurrentMana);
+	OnManaChange.Broadcast(CurrentStats.CurrentMana, CurrentStats.MaxMana);
 }
 
 void UStatsComponent::AddAttackCooldown(const float AttackCooldown)

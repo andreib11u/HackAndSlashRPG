@@ -7,6 +7,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "HackAndSlashPlayerController.generated.h"
 
+class UHUDWidget;
 class UBasicAttack;
 class UAbility;
 class UAbilityComponent;
@@ -30,8 +31,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UnsetDestination();
-	
-	void FindPathFollowingComponent();
 
 	void SetEnemy(ABaseCharacter* EnemyToSet) { Enemy = EnemyToSet; }
 	
@@ -42,6 +41,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 private:
+	void FindPathFollowingComponent();
+	void InitializeHUD();
+	
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UAbilityComponent* PlayerAbilityComponent;
 
@@ -65,4 +67,7 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void AbortMove();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefaultClasses", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UHUDWidget> HUDClass;
 };

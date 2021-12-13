@@ -3,11 +3,13 @@
 
 #include "GameplayFramework/HackAndSlashPlayerController.h"
 #include "Abilities/BasicAttack.h"
+#include "Blueprint/UserWidget.h"
 #include "Characters/BaseCharacter.h"
 #include "Characters/EnemyCharacter.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/AbilityComponent.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "UI/HUDWidget.h"
 
 void AHackAndSlashPlayerController::SetupInputComponent()
 {
@@ -39,6 +41,15 @@ void AHackAndSlashPlayerController::FindPathFollowingComponent()
 	}
 }
 
+void AHackAndSlashPlayerController::InitializeHUD()
+{
+	auto HUDWidget = CreateWidget<UHUDWidget>(this, *HUDClass);
+
+	HUDWidget->SetCharacterToDisplay(ControlledCharacter);
+
+	HUDWidget->AddToViewport();
+}
+
 void AHackAndSlashPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -54,6 +65,8 @@ void AHackAndSlashPlayerController::BeginPlay()
 	AttackAbility->SetOwner(ControlledCharacter);
 
 	FindPathFollowingComponent();
+
+	InitializeHUD();
 }
 
 void AHackAndSlashPlayerController::Tick(float DeltaSeconds)

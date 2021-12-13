@@ -69,8 +69,8 @@ struct FStatLimits
 	}
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChange, const float, CurrentHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChange, const float, CurrentMana);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, const float, CurrentHealth, const float, MaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnManaChange, const float, CurrentMana, const float, MaxHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatsChange, const FCharacterStats&, CurrentStats);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
