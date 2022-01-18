@@ -22,6 +22,8 @@ class HACKANDSLASHRPG_API AHackAndSlashPlayerController : public APlayerControll
 {
 	GENERATED_BODY()
 public:
+	AHackAndSlashPlayerController();
+	
 	virtual void SetupInputComponent() override;
 	
 	/** When destination is set, player is either moving to location at mouse cursor,
@@ -43,7 +45,8 @@ protected:
 private:
 	void FindPathFollowingComponent();
 	void InitializeHUD();
-	
+	void ConfigureAttackAbility();
+
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UAbilityComponent* PlayerAbilityComponent;
 

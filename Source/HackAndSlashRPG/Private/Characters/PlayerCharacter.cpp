@@ -4,6 +4,7 @@
 #include "Characters/PlayerCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/AttributesComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/StatsComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -37,6 +38,10 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComponent->RotationRate = FRotator(0.f, 1000.f, 0.f);
 
 	ConfigureAttributeComponent();
+
+	// Not response to player's own cursor
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1/*MouseCursor*/, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1/*MouseCursor*/, ECollisionResponse::ECR_Ignore);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

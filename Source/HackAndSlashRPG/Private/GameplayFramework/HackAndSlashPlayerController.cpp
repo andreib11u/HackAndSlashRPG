@@ -11,6 +11,11 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "UI/HUDWidget.h"
 
+AHackAndSlashPlayerController::AHackAndSlashPlayerController()
+{
+	bEnableMouseOverEvents = true;
+}
+
 void AHackAndSlashPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -50,6 +55,13 @@ void AHackAndSlashPlayerController::InitializeHUD()
 	HUDWidget->AddToViewport();
 }
 
+void AHackAndSlashPlayerController::ConfigureAttackAbility()
+{
+	AttackAbility = NewObject<UBasicAttack>();
+
+	AttackAbility->SetOwner(ControlledCharacter);
+}
+
 void AHackAndSlashPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -58,11 +70,9 @@ void AHackAndSlashPlayerController::BeginPlay()
 
 	PlayerAbilityComponent = GetPawn()->FindComponentByClass<UAbilityComponent>();
 
-	AttackAbility = NewObject<UBasicAttack>();
-
 	ControlledCharacter = Cast<APlayerCharacter>(GetCharacter());
-
-	AttackAbility->SetOwner(ControlledCharacter);
+	
+	ConfigureAttackAbility();
 
 	FindPathFollowingComponent();
 
@@ -83,7 +93,7 @@ void AHackAndSlashPlayerController::Tick(float DeltaSeconds)
 		else 
 		{
 			FHitResult OutHit;
-			if (GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, OutHit))
+			if (GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1/*MouseCursor*/, false, OutHit))
 			{
 				Enemy = Cast<AEnemyCharacter>(OutHit.GetActor());
 				if (Enemy)

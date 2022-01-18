@@ -11,10 +11,7 @@
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
 
@@ -68,6 +65,9 @@ void ABaseCharacter::MoveTo(const FVector Location)
 	if (CanMove())
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Location);
+
+		// Stop any montages when start moving
+		StopAnimMontage();
 	}
 }
 
