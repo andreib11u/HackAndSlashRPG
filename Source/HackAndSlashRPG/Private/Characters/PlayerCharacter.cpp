@@ -9,16 +9,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-void APlayerCharacter::ConfigureAttributeComponent()
-{
-	AttributesComponent = CreateDefaultSubobject<UAttributesComponent>("Attributes");
-
-	AttributesComponent->OnStrengthChange.AddDynamic(this, &APlayerCharacter::OnStrengthChange);
-	AttributesComponent->OnAgilityChange.AddDynamic(this, &APlayerCharacter::APlayerCharacter::OnAgilityChange);
-	AttributesComponent->OnIntelligenceChange.AddDynamic(this, &APlayerCharacter::APlayerCharacter::OnIntelligenceChange);
-	AttributesComponent->OnVitalityChange.AddDynamic(this, &APlayerCharacter::APlayerCharacter::OnVitalityChange);
-}
-
 APlayerCharacter::APlayerCharacter()
 {
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -37,8 +27,6 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComponent->bOrientRotationToMovement = true;
 	CharacterMovementComponent->RotationRate = FRotator(0.f, 1000.f, 0.f);
 
-	ConfigureAttributeComponent();
-
 	// Not response to player's own cursor
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1/*MouseCursor*/, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1/*MouseCursor*/, ECollisionResponse::ECR_Ignore);
@@ -55,31 +43,12 @@ void APlayerCharacter::PostInitProperties()
 
 }
 
-FAttributes APlayerCharacter::GetAttributes() const
+void APlayerCharacter::OnConstruction(const FTransform& Transform)
 {
-	return AttributesComponent->GetAttributes();
+	Super::OnConstruction(Transform);
 }
 
-void APlayerCharacter::OnStrengthChange(int32 Change)
+void APlayerCharacter::BeginPlay()
 {
-	const float DmgPerStrength = GetAttributes().DmgPerStrength;
-	GetStatsComponent()->AddDamageMultiplier(DmgPerStrength * Change);
-}
-
-void APlayerCharacter::OnAgilityChange(int32 Change)
-{
-	const float CooldownReductionPerAgility = GetAttributes().CooldownReductionPerAgility;
-	GetStatsComponent()->AddAttackCooldown(CooldownReductionPerAgility * Change);
-}
-
-void APlayerCharacter::OnIntelligenceChange(int32 Change)
-{
-	const float MpPerIntelligence = GetAttributes().MpPerIntelligence;
-	GetStatsComponent()->AddMana(MpPerIntelligence * Change);
-}
-
-void APlayerCharacter::OnVitalityChange(int32 Change)
-{
-	const float HpPerVitality = GetAttributes().HpPerVitality;
-	GetStatsComponent()->AddHealth(HpPerVitality * Change);
+	Super::BeginPlay();
 }

@@ -7,15 +7,75 @@
 #include "Components/AbilityComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StatsComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "StatsAndAttributes/Resource.h"
+#include "StatsAndAttributes/Stat.h"
+#include "StatsAndAttributes/StatCollection.h"
 
-// Sets default values
+UStat* ABaseCharacter::GetStat(EStat Stat)const
+{
+	return StatsCollection->Stats[StatToInt(Stat)];
+}
+
+float ABaseCharacter::GetStatValue(EStat Stat)const
+{
+	UStat* FoundStat = StatsCollection->Stats[StatToInt(Stat)];
+	return FoundStat->Get();
+}
+
+UResource* ABaseCharacter::GetResource(EResource Resource)const
+{
+	return StatsCollection->Resources[ResourceToInt(Resource)];
+}
+
+float ABaseCharacter::GetResourceValue(EResource Resource)const
+{
+	UResource* FoundResource = StatsCollection->Resources[ResourceToInt(Resource)];
+	return FoundResource->Get();
+}
+
+void ABaseCharacter::ConfigureStats()
+{
+	StatsCollection = NewObject<UStatCollection>();
+	StatsCollection->Init();
+
+	UStat* ArmorStat = GetStat(EStat::Armor);
+	ArmorStat->OnChange.AddDynamic(this, &ABaseCharacter::CalculateDefenseFromArmor);
+	CalculateDefenseFromArmor(ArmorStat->Get());
+
+	UStat* AttackSpeedStat = GetStat(EStat::AttackSpeed);
+	AttackSpeedStat->OnChange.AddDynamic(this, &ABaseCharacter::CalculateAttackCooldownFromAttackSpeed);
+	CalculateAttackCooldownFromAttackSpeed(AttackSpeedStat->Get());
+
+	UStat* MoveSpeedStat = GetStat(EStat::MoveSpeed);
+	MoveSpeedStat->OnChange.AddDynamic(this, &ABaseCharacter::OnMoveSpeedChange);
+	OnMoveSpeedChange(MoveSpeedStat->Get());
+
+	UStat* HealthRegenStat = GetStat(EStat::HealthRegen);
+	HealthRegenStat->OnChange.AddDynamic(this, &ABaseCharacter::OnHealthRegenChange);
+	OnHealthRegenChange(HealthRegenStat->Get());
+
+	UStat* ManaRegenStat = GetStat(EStat::ManaRegen);
+	ManaRegenStat->OnChange.AddDynamic(this, &ABaseCharacter::OnManaRegenChange);
+	OnManaRegenChange(ManaRegenStat->Get());
+
+	StatsCollection->InitResources();
+}
+
 ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
 
-	StatsComponent = CreateDefaultSubobject<UStatsComponent>("CharacterStats");
+}
+
+void ABaseCharacter::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	ConfigureStats();
 }
 
 void ABaseCharacter::StartRotating(const FVector Target, const float RotationSpeed, bool StopWhenFaceTarget)
@@ -40,7 +100,7 @@ void ABaseCharacter::StartAttackCooldown()
 	if (GetWorld())
 	{
 		bIsAttackInCooldown = true;
-		GetWorld()->GetTimerManager().SetTimer(AttackCooldownTimerHandle,this, &ABaseCharacter::OnAttackCooldownExpired, GetStats().AttackCooldown);
+		GetWorld()->GetTimerManager().SetTimer(AttackCooldownTimerHandle,this, &ABaseCharacter::OnAttackCooldownExpired, InternalData.AttackCooldown);
 	}
 }
 
@@ -51,7 +111,7 @@ void ABaseCharacter::PlayAttackMontage()
 
 	// Make montage length equal to AttackCooldown, so no matter how slow
 	// or fast animation is, it is always the same length
-	const float Rate = Length / GetStats().AttackCooldown;
+	const float Rate = Length / InternalData.AttackCooldown;
 	PlayAnimMontage(AttackMontage, Rate);
 }
 
@@ -76,19 +136,35 @@ void ABaseCharacter::StopMoving()
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
 }
 
-FCharacterStats ABaseCharacter::GetStats() const
+void ABaseCharacter::CalculateDefenseFromArmor(float Armor)
 {
-	return StatsComponent->GetStats();
+	InternalData.DefenseMultiplier = 1.f - Armor * 0.01f;
 }
 
-FCharacterStats ABaseCharacter::GetBaseStats() const
+void ABaseCharacter::CalculateAttackCooldownFromAttackSpeed(float AttackSpeed)
 {
-	return StatsComponent->GetBaseStats();
+	InternalData.AttackCooldown = 1.f - AttackSpeed * 0.01f;
+}
+
+void ABaseCharacter::OnMoveSpeedChange(float MoveSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed * 3.f;
+}
+
+void ABaseCharacter::OnHealthRegenChange(float HealthRegen)
+{
+	InternalData.HealthRegen = HealthRegen;
+}
+
+void ABaseCharacter::OnManaRegenChange(float ManaRegen)
+{
+	InternalData.ManaRegen = ManaRegen;
 }
 
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 }
 
@@ -115,6 +191,19 @@ void ABaseCharacter::Tick(float DeltaTime)
 			StopRotating();
 		}
 	}
+
+	UResource* HealthRes = GetResource(EResource::Health);
+	HealthRes->ChangeValue(InternalData.HealthRegen * DeltaTime);
+
+	UResource* ManaRes = GetResource(EResource::Mana);
+	ManaRes->ChangeValue(InternalData.ManaRegen * DeltaTime);
+}
+
+void ABaseCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+
 }
 
 void ABaseCharacter::OnAttackCooldownExpired()

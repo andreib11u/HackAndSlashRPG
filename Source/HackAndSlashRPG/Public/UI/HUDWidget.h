@@ -19,12 +19,27 @@ class HACKANDSLASHRPG_API UHUDWidget : public UUserWidget
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterToDisplay(APlayerCharacter* PlayerCharacter);
-	
+
 private:
+	void UpdateHealthBar();
+	void UpdateManaBar();
+	
 	UFUNCTION()
-	void OnHealthChange(const float CurrentHealth, const float MaxHealth);
+	void OnHealthChange(const float Health);
 	UFUNCTION()
-	void OnManaChange(const float CurrentMana, const float MaxMana);
+	void OnManaChange(const float Mana);
+	
+	
+	UFUNCTION()
+	void OnMaxHealthChange(const float MaxHealth);
+	UFUNCTION()
+	void OnMaxManaChange(const float MaxMana);
+
+	float CurrentHealth;
+	float CurrentMaxHealth;
+
+	float CurrentMana;
+	float CurrentMaxMana;
 	
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* HealthBar;

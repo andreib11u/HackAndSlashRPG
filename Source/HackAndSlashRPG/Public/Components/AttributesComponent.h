@@ -59,8 +59,6 @@ class HACKANDSLASHRPG_API UAttributesComponent : public UActorComponent
 public:	
 	UAttributesComponent();
 
-	FAttributes GetAttributes()const { return Attributes; }
-
 	/**
 	 * Cannot spend more than there is in PointsToSpend
 	 * @param Attribute - The attribute to spend points on
@@ -88,6 +86,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnVitalityChange OnVitalityChange;
+
+	FAttributes GetAttributes()const { return Attributes; }
+	int32 GetPointsToSpend()const { return PointsToSpend; }
 	
 protected:
 	virtual void BeginPlay() override;

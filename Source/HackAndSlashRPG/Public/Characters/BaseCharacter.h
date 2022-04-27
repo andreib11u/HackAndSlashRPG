@@ -9,7 +9,11 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
-class UStatsComponent;
+enum class EResource : uint8;
+enum class EStat : uint8;
+class UResource;
+class UStat;
+class UStatCollection;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRotationEnd);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackLand);
@@ -20,6 +24,19 @@ struct FRotationState
 	FRotator Target;
 	bool bEndWhenFaceTarget;
 	float Speed;
+};
+
+
+struct FInternalData
+{
+	/** All incoming damage multiplies on this */
+	float DefenseMultiplier;
+
+	float AttackCooldown;
+
+	float HealthRegen;
+
+	float ManaRegen;
 };
 
 /**
@@ -34,9 +51,7 @@ public:
 	// Sets default values for character's properties
 	ABaseCharacter();
 
-	UAnimMontage* GetRandomAttackMontage() const { return AttackMontages[FMath::RandRange(0, AttackMontages.Num() - 1)]; }
-
-	bool IsLockedInAnimation()const { return bLockedInAnimation; }
+	virtual void PostInitProperties() override;
 
 	/**
 	 * Rotate to face Target
@@ -56,7 +71,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAttackInCooldown()const { return bIsAttackInCooldown; }
-
+	
+	bool IsLockedInAnimation()const { return bLockedInAnimation; }
 	void SetLockedInAnimation(bool bIsLockedInAnimation) { bLockedInAnimation = bIsLockedInAnimation; }
 
 	UFUNCTION(BlueprintCallable)
@@ -71,28 +87,53 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StopMoving();
 
+	// Changing stats callbacks
+	
+	UFUNCTION()
+	void CalculateDefenseFromArmor(float Armor);
+
+	UFUNCTION()
+	void CalculateAttackCooldownFromAttackSpeed(float AttackSpeed);
+
+	UFUNCTION()
+	void OnMoveSpeedChange(float MoveSpeed);
+
+	UFUNCTION()
+	void OnHealthRegenChange(float HealthRegen);
+	
+	UFUNCTION()
+	void OnManaRegenChange(float ManaRegen);
+
+	// Delegates
+	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnRotationEnd OnRotationEnd;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnAttackLand OnAttackLand;
 
-	UFUNCTION(BlueprintCallable)
-	FCharacterStats GetStats()const;
+	/** Getters */
 
-	UFUNCTION(BlueprintCallable)
-	FCharacterStats GetBaseStats()const;
-
-	UStatsComponent* GetStatsComponent()const { return StatsComponent; }
+	UAnimMontage* GetRandomAttackMontage() const { return AttackMontages[FMath::RandRange(0, AttackMontages.Num() - 1)]; }
+	UStatCollection* GetStats()const { return StatsCollection; }
+	inline UStat* GetStat(EStat Stat)const;
+	inline float GetStatValue(EStat Stat)const;
+	inline UResource* GetResource(EResource Resource)const;
+	inline float GetResourceValue(EResource Resource)const;
 	
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UStatsComponent* StatsComponent;
+	void ConfigureStats();
+	
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UStatCollection* StatsCollection;
+
+	FInternalData InternalData;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UAbilityComponent* AbilityComponent;
