@@ -6,32 +6,31 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/AbilityComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/StatsComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "StatsAndAttributes/Resource.h"
 #include "StatsAndAttributes/Stat.h"
 #include "StatsAndAttributes/StatCollection.h"
 
-UStat* ABaseCharacter::GetStat(EStat Stat)const
+inline UStat* ABaseCharacter::GetStat(EStat Stat)const
 {
-	return StatsCollection->Stats[StatToInt(Stat)];
+	return StatsCollection->Stats[EnumToInt(Stat)];
 }
 
 float ABaseCharacter::GetStatValue(EStat Stat)const
 {
-	UStat* FoundStat = StatsCollection->Stats[StatToInt(Stat)];
+	UStat* FoundStat = StatsCollection->Stats[EnumToInt(Stat)];
 	return FoundStat->Get();
 }
 
-UResource* ABaseCharacter::GetResource(EResource Resource)const
+inline UResource* ABaseCharacter::GetResource(EResource Resource)const
 {
-	return StatsCollection->Resources[ResourceToInt(Resource)];
+	return StatsCollection->Resources[EnumToInt(Resource)];
 }
 
 float ABaseCharacter::GetResourceValue(EResource Resource)const
 {
-	UResource* FoundResource = StatsCollection->Resources[ResourceToInt(Resource)];
+	UResource* FoundResource = StatsCollection->Resources[EnumToInt(Resource)];
 	return FoundResource->Get();
 }
 
@@ -41,26 +40,26 @@ void ABaseCharacter::ConfigureStats()
 	StatsCollection->Init();
 
 	UStat* ArmorStat = GetStat(EStat::Armor);
-	ArmorStat->OnChange.AddDynamic(this, &ABaseCharacter::CalculateDefenseFromArmor);
+	ArmorStat->OnChange.AddUObject(this, &ABaseCharacter::CalculateDefenseFromArmor);
 	CalculateDefenseFromArmor(ArmorStat->Get());
 
 	UStat* AttackSpeedStat = GetStat(EStat::AttackSpeed);
-	AttackSpeedStat->OnChange.AddDynamic(this, &ABaseCharacter::CalculateAttackCooldownFromAttackSpeed);
+	AttackSpeedStat->OnChange.AddUObject(this, &ABaseCharacter::CalculateAttackCooldownFromAttackSpeed);
 	CalculateAttackCooldownFromAttackSpeed(AttackSpeedStat->Get());
 
 	UStat* MoveSpeedStat = GetStat(EStat::MoveSpeed);
-	MoveSpeedStat->OnChange.AddDynamic(this, &ABaseCharacter::OnMoveSpeedChange);
+	MoveSpeedStat->OnChange.AddUObject(this, &ABaseCharacter::OnMoveSpeedChange);
 	OnMoveSpeedChange(MoveSpeedStat->Get());
 
 	UStat* HealthRegenStat = GetStat(EStat::HealthRegen);
-	HealthRegenStat->OnChange.AddDynamic(this, &ABaseCharacter::OnHealthRegenChange);
+	HealthRegenStat->OnChange.AddUObject(this, &ABaseCharacter::OnHealthRegenChange);
 	OnHealthRegenChange(HealthRegenStat->Get());
 
 	UStat* ManaRegenStat = GetStat(EStat::ManaRegen);
-	ManaRegenStat->OnChange.AddDynamic(this, &ABaseCharacter::OnManaRegenChange);
+	ManaRegenStat->OnChange.AddUObject(this, &ABaseCharacter::OnManaRegenChange);
 	OnManaRegenChange(ManaRegenStat->Get());
 
-	StatsCollection->InitResources();
+	StatsCollection->UpdateResources();
 }
 
 ABaseCharacter::ABaseCharacter()
@@ -192,6 +191,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	FString Name = *GetName();
+
 	UResource* HealthRes = GetResource(EResource::Health);
 	HealthRes->ChangeValue(InternalData.HealthRegen * DeltaTime);
 
@@ -202,7 +203,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 void ABaseCharacter::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-
 
 }
 

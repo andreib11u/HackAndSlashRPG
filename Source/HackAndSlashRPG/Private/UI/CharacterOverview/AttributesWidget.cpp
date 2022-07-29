@@ -2,14 +2,12 @@
 
 
 #include "UI/CharacterOverview/AttributesWidget.h"
-
-#include "Components/AttributesComponent.h"
 #include "UI/CharacterOverview/AttributeLabel.h"
 
 void UAttributesWidget::Init(UAttributesComponent* AttributesToDisplay)
 {
-	const FAttributes Attributes = AttributesToDisplay->GetAttributes();
-	const bool HasPointsToSpend = AttributesToDisplay->GetPointsToSpend() > 0;
+	//const FAttributes Attributes = AttributesToDisplay->GetAttributes();
+	/*const bool HasPointsToSpend = AttributesToDisplay->GetPointsToSpend() > 0;
 	
 	StrengthAttributeLabel->Init(NSLOCTEXT("Widgets", "Strength", "Strength"), Attributes.Strength, HasPointsToSpend);
 
@@ -17,5 +15,5 @@ void UAttributesWidget::Init(UAttributesComponent* AttributesToDisplay)
 
 	IntelligenceAttributeLabel->Init(NSLOCTEXT("Widgets", "Intelligence", "Intelligence"), Attributes.Intelligence, HasPointsToSpend);
 
-	VitalityAttributeLabel->Init(NSLOCTEXT("Widgets", "Vitality", "Vitality"), Attributes.Vitality, HasPointsToSpend);
+	VitalityAttributeLabel->Init(NSLOCTEXT("Widgets", "Vitality", "Vitality"), Attributes.Vitality, HasPointsToSpend);*/
 }

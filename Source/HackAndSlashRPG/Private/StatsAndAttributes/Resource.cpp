@@ -9,16 +9,17 @@ UResource::UResource()
 	
 }
 
-UResource* UResource::Create(UStat* DependentStat, EResource InType, FText InName)
+UResource* UResource::Create(float InitialValue, EResource InType, FText InName)
 {
-	UResource* NewResource = NewObject<UResource>();
+	FName ResourceName = MakeUniqueObjectName(GetTransientPackage(), StaticClass(), FName(InName.ToString()));
+
+	UResource* NewResource = NewObject<UResource>(GetTransientPackage(), ResourceName);
 	NewResource->MinValue = 0.f;
-	NewResource->MaxValue = DependentStat->Get();
+	NewResource->MaxValue = InitialValue;
 	NewResource->Name = InName;
 	NewResource->Type = InType;
-	NewResource->InitialValue  = DependentStat->Get();
-	NewResource->Value  = DependentStat->Get();
-	DependentStat->OnChange.AddDynamic(NewResource, &UResource::OnDependentStatChange);
+	NewResource->InitialValue  = InitialValue;
+	NewResource->Value  = InitialValue;
 	return NewResource;
 }
 
@@ -32,6 +33,22 @@ void UResource::ChangeValue(float Change)
 		OnChange.Broadcast(Value);
 	}
 	
+	if (Value == MinValue)
+	{
+		OnDeplete.Broadcast();
+	}
+}
+
+void UResource::SetValue(float ValueToSet)
+{
+	const float ValueBefore = Value;
+	Value = FMath::Clamp(ValueToSet, MinValue, MaxValue);
+
+	if (ValueBefore != Value)
+	{
+		OnChange.Broadcast(Value);
+	}
+
 	if (Value == MinValue)
 	{
 		OnDeplete.Broadcast();

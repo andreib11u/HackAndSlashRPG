@@ -2,7 +2,6 @@
 
 
 #include "UI/HUDWidget.h"
-#include "Components/StatsComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -17,11 +16,11 @@ void UHUDWidget::SetCharacterToDisplay(APlayerCharacter* PlayerCharacter)
 	UResource* Health = PlayerCharacter->GetResource(EResource::Health);
 	UResource* Mana = PlayerCharacter->GetResource(EResource::Mana);
 
-	MaxHealth->OnChange.AddDynamic(this, &UHUDWidget::OnMaxHealthChange);
-	MaxMana->OnChange.AddDynamic(this, &UHUDWidget::OnMaxManaChange);
+	MaxHealth->OnChange.AddUObject(this, &UHUDWidget::OnMaxHealthChange);
+	MaxMana->OnChange.AddUObject(this, &UHUDWidget::OnMaxManaChange);
 
-	Health->OnChange.AddDynamic(this, &UHUDWidget::OnHealthChange);
-	Mana->OnChange.AddDynamic(this, &UHUDWidget::OnManaChange);
+	Health->OnChange.AddUObject(this, &UHUDWidget::OnHealthChange);
+	Mana->OnChange.AddUObject(this, &UHUDWidget::OnManaChange);
 
 	OnHealthChange(Health->Get());
 	OnMaxHealthChange(MaxHealth->Get());

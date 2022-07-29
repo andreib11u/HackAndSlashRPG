@@ -3,11 +3,10 @@
 
 #include "Characters/PlayerCharacter.h"
 #include "Camera/CameraComponent.h"
-#include "Components/AttributesComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/StatsComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "StatsAndAttributes/Attributes.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -41,6 +40,8 @@ void APlayerCharacter::PostInitProperties()
 {
 	Super::PostInitProperties();
 
+	Attributes = NewObject<UAttributes>();
+	Attributes->Init(this);
 }
 
 void APlayerCharacter::OnConstruction(const FTransform& Transform)

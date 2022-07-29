@@ -4,8 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "StatsAndAttributes/Attributes.h"
+#include "StatsAndAttributes/Stat.h"
 #include "PlayerCharacter.generated.h"
 
+enum class EAttribute : uint8;
+class UPlayerAttribute;
+class UAttributes;
 class UAttributesComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -18,10 +23,13 @@ class HACKANDSLASHRPG_API APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 public:
+	friend UAttributes;
+
 	APlayerCharacter();
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitProperties() override;
-	
+
+	UPlayerAttribute* GetAttribute(EAttribute Attribute)const { return Attributes->Attributes[EnumToInt(Attribute)]; }
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
@@ -30,4 +38,16 @@ private:
 	USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* TopDownCamera;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Initial Attributes", meta = (AllowPrivateAccess = "true"))
+	int32 InitialStrength = 10;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Initial Attributes", meta = (AllowPrivateAccess = "true"))
+	int32 InitialAgility = 10;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Initial Attributes", meta = (AllowPrivateAccess = "true"))
+	int32 InitialIntelligence = 10;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Initial Attributes", meta = (AllowPrivateAccess = "true"))
+	int32 InitialVitality = 10;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAttributes* Attributes;
 };

@@ -13,36 +13,36 @@ enum class EResource : uint8
 	Mana   UMETA(DisplayName = "Mana")
 };
 
-int32 static ResourceToInt(EResource Resource)
-{
-	return static_cast<int32>(Resource);
-}
-
 class UStat;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeResource, float, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeplete);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeResource, float);
+DECLARE_MULTICAST_DELEGATE(FOnDeplete);
 
 /**
  * Health, mana etc.
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew)
+UCLASS(BlueprintType)
 class HACKANDSLASHRPG_API UResource : public UObject
 {
 	GENERATED_BODY()
 public:
 	UResource();
 
-	static UResource* Create(UStat* DependentStat, EResource InType, FText InName);
+	static UResource* Create(float InitialValue, EResource InType, FText InName);
 	
 	UFUNCTION(BlueprintPure)
 	float Get()const { return Value; }
 
+	friend class UStatCollection;
+
 	UFUNCTION(BlueprintCallable)
 	void ChangeValue(float Change);
 
-	UPROPERTY(BlueprintCallable, BlueprintAssignable)
+	UFUNCTION(BlueprintCallable)
+	void SetValue(float ValueToSet);
+
+
 	FOnChangeResource OnChange;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable)
+
 	FOnDeplete OnDeplete;
 
 	UFUNCTION(BlueprintCallable)

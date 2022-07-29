@@ -23,18 +23,18 @@ enum class EStat : uint8
 	
 };
 
-int32 static StatToInt(EStat Stat)
+template <typename EnumClass>
+int32 static EnumToInt(EnumClass Enum)
 {
-	return static_cast<int32>(Stat);
+	return static_cast<int32>(Enum);
 }
 
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeStat, float, NewValue);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeStat, float);
 
 /**
  * RPG stat ie armor, damage etc. 
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew)
+UCLASS(BlueprintType)
 class HACKANDSLASHRPG_API UStat : public UObject
 {
 	GENERATED_BODY()
@@ -47,24 +47,22 @@ public:
 	UFUNCTION(BlueprintPure)
 	float Get()const { return ClampedValue; }
 
+	void SetInitialValue(float InInitialValue);
+	void SetValue(float InValue);
+
 	/** Call only from modificators */
 	UFUNCTION(BlueprintCallable)
-	void AddChange(float Value);
+	void Add(float Value);
 	// TODO: make private, friend modificator class
 	/** Call only from modificators */
 	UFUNCTION(BlueprintCallable)
-	void RemoveChange(float Value);
+	void Remove(float Value);
 
-	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnChangeStat OnChange;
-
-protected:
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 private:
-	void SetInitialValue(float InInitialValue);
 	
-	/** To prevent modificators from removing more value than needed */
+	/** To prevent modificators from removing more value than needed when the value is already at max */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float OverflowValue;
 	

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 
 #include "Components/AbilityComponent.h"
-#include "Components/StatsComponent.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
@@ -129,8 +128,8 @@ protected:
 
 private:
 	void ConfigureStats();
-	
-	UPROPERTY(EditAnywhere, Instanced, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStatCollection* StatsCollection;
 
 	FInternalData InternalData;

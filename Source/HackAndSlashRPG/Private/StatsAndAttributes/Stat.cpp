@@ -9,26 +9,24 @@ UStat::UStat()
 	OverflowValue = ClampedValue;
 }
 
-void UStat::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	FName PropertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UStat, InitialValue))
-	{
-		SetInitialValue(InitialValue);
-	}
-}
-
 void UStat::SetInitialValue(float InInitialValue)
 {
 	InitialValue = InInitialValue;
-	ClampedValue = FMath::Clamp(InitialValue, MinValue, MaxValue);
+	SetValue(InInitialValue);
+}
+
+void UStat::SetValue(float InValue)
+{
+	ClampedValue = FMath::Clamp(InValue, MinValue, MaxValue);
 	OverflowValue = ClampedValue;
+	OnChange.Broadcast(ClampedValue);
 }
 
 UStat* UStat::Create(float InInitialValue, EStat InType, FText InName, float InMinValue, float InMaxValue)
 {
-	UStat* NewStat = NewObject<UStat>();
+	FName StatName = MakeUniqueObjectName(GetTransientPackage(), StaticClass(), FName(InName.ToString()));
+
+	UStat* NewStat = NewObject<UStat>(GetTransientPackage(), StatName);
 	NewStat->MaxValue = InMaxValue;
 	NewStat->MinValue = InMinValue;
 	NewStat->SetInitialValue(InInitialValue);
@@ -37,14 +35,14 @@ UStat* UStat::Create(float InInitialValue, EStat InType, FText InName, float InM
 	return NewStat;
 }
 
-void UStat::AddChange(float Value)
+void UStat::Add(float Value)
 {
 	OverflowValue = OverflowValue + Value;
 	ClampedValue = FMath::Clamp(OverflowValue, MinValue, MaxValue);
 	OnChange.Broadcast(ClampedValue);
 }
 
-void UStat::RemoveChange(float Value)
+void UStat::Remove(float Value)
 {
 	OverflowValue = OverflowValue - Value;
 	ClampedValue = FMath::Clamp(OverflowValue, MinValue, MaxValue);

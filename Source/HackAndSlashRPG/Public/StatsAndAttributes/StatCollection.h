@@ -11,24 +11,24 @@ class UStat;
 /**
  * Contains stats in a map and applies modificators
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew)
+UCLASS(Blueprintable, BlueprintType)
 class HACKANDSLASHRPG_API UStatCollection : public UObject
 {
 	GENERATED_BODY()
 public:
-	
 	UStatCollection();
 
 	void Init();
-	
-	void InitResources(); // Call after base character configured stats
-	void InitStats();
 
-	virtual void PostInitProperties() override;
+	void UpdateResources();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<UStat*> Stats;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<UResource*> Resources;
+
+private:
+	void InitStats();
+	void InitResources();
 };
