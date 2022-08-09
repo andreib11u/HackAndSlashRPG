@@ -13,13 +13,13 @@
 void UAttributes::Init(APlayerCharacter* Character)
 {
 	UPlayerAttribute* Strength = UPlayerAttribute::Create(Character->InitialStrength,
-		NSLOCTEXT("Attributes", "Strength", "Strength"), EAttribute::Strength);
+		NSLOCTEXT("Attributes", "Strength", "Strength"), EAttribute::Strength, this);
 	UPlayerAttribute* Agility = UPlayerAttribute::Create(Character->InitialAgility,
-		NSLOCTEXT("Attributes", "Agility", "Agility"), EAttribute::Agility);
+		NSLOCTEXT("Attributes", "Agility", "Agility"), EAttribute::Agility, this);
 	UPlayerAttribute* Intelligence = UPlayerAttribute::Create(Character->InitialIntelligence,
-		NSLOCTEXT("Attributes", "Intelligence", "Intelligence"), EAttribute::Intelligence);
+		NSLOCTEXT("Attributes", "Intelligence", "Intelligence"), EAttribute::Intelligence, this);
 	UPlayerAttribute* Vitality = UPlayerAttribute::Create(Character->InitialVitality,
-		NSLOCTEXT("Attributes", "Vitality", "Vitality"), EAttribute::Vitality);
+		NSLOCTEXT("Attributes", "Vitality", "Vitality"), EAttribute::Vitality, this);
 
 	Attributes.Add(Strength);
 	Attributes.Add(Agility);
@@ -42,6 +42,12 @@ void UAttributes::Init(APlayerCharacter* Character)
 	// TODO: make a stats method that fulls every resource
 	AffectedStats->Resources[EnumToInt(EResource::Health)]->SetValue(AffectedStats->Stats[EnumToInt(EStat::MaxHealth)]->Get());
 	AffectedStats->Resources[EnumToInt(EResource::Mana)]->SetValue(AffectedStats->Stats[EnumToInt(EStat::MaxMana)]->Get());
+}
+
+void UAttributes::SetPoints(int32 InPoints)
+{
+	Points = InPoints;
+	OnPointsChange.Broadcast(Points);
 }
 
 void UAttributes::OnStrengthChanged(int32 NewStrength)

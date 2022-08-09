@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AttributesWidget.generated.h"
 
+class UAttributes;
 class UAttributesComponent;
 class UAttributeLabel;
 /**
@@ -16,7 +17,7 @@ class HACKANDSLASHRPG_API UAttributesWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void Init(UAttributesComponent* AttributesToDisplay);
+	void Init(UAttributes* AttributesToDisplay);
 private:
 	UPROPERTY(meta = (BindWidget))
 	UAttributeLabel* StrengthAttributeLabel;

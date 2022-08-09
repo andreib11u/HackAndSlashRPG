@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AttributeLabel.generated.h"
 
+class UPlayerAttribute;
 class UButton;
 class UTextBlock;
 /**
@@ -16,11 +17,10 @@ class HACKANDSLASHRPG_API UAttributeLabel : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void Init(FText Name, int32 CurrentNumber, bool HavePointsToSpend);
-	
-	UTextBlock* GetAttributeName()const { return AttributeName; }
-	UTextBlock* GetAttributeNumber()const { return AttributeNumber; }
-	UButton* GetAddAttributeButton()const { return AddAttributeButton; }
+	void Init(UPlayerAttribute* AttributeToDisplay);
+
+	UFUNCTION()
+	void OnPointsChange(int32 Points);
 	
 private:
 	UPROPERTY(meta = (BindWidget))

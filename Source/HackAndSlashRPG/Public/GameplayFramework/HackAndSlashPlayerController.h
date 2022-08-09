@@ -7,6 +7,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "HackAndSlashPlayerController.generated.h"
 
+class UShowCharacterOverviewWidget;
 class UHUDWidget;
 class UBasicAttack;
 class UAbility;
@@ -35,6 +36,9 @@ public:
 	void UnsetDestination();
 
 	void SetEnemy(ABaseCharacter* EnemyToSet) { Enemy = EnemyToSet; }
+
+	UFUNCTION()
+	void ToggleCharacterOverview();
 	
 	/** Set Enemy to nullptr */
 	UFUNCTION(BlueprintCallable)
@@ -42,6 +46,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 private:
 	void FindPathFollowingComponent();
 	void InitializeHUD();
@@ -58,12 +63,11 @@ private:
 
 	UPROPERTY(Transient)
 	ABaseCharacter* Enemy;
-
 	UPROPERTY(Transient)
 	ABaseCharacter* QueuedEnemy;
 
-	bool bIsDestinationSet;
-	bool bIsAttackQueued;
+	bool bDestinationSet;
+	bool bAttackQueued;
 
 	UPROPERTY()
 	UPathFollowingComponent* PathFollowingComp;
@@ -73,4 +77,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefaultClasses", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UHUDWidget> HUDClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefaultClasses", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UShowCharacterOverviewWidget> ShowCharacterOverviewWidgetClass;
+
+	UPROPERTY(Transient)
+	UShowCharacterOverviewWidget* OpenedCharacterOverview;
+	FTimerHandle CloseCharacterOverviewTimer;
+	UFUNCTION()
+	void OnCloseWidgetAnimationEnd();
 };

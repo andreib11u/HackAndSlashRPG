@@ -4,18 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Utility/RPGEnums.h"
 #include "PlayerAttribute.generated.h"
 
+class UAttributes;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAttributeChange, int32);
-
-UENUM(BlueprintType)
-enum class EAttribute : uint8
-{
-	Strength UMETA(DisplayName = "Strength"),
-	Agility  UMETA(DisplayName = "Agility"),
-	Intelligence UMETA(DisplayName = "Intelligence"),
-	Vitality UMETA(DisplayName = "Vitality")
-};
 
 /**
  * 
@@ -25,13 +18,18 @@ class HACKANDSLASHRPG_API UPlayerAttribute : public UObject
 {
 	GENERATED_BODY()
 public:
-	static UPlayerAttribute* Create(int32 InValue, FText InName, EAttribute InType);
+	static UPlayerAttribute* Create(int32 InValue, FText InName, EAttribute InType, UAttributes* InAttributes);
 
 	int32 Get()const { return Value; }
 	void SetValue(int32 InValue);
 	void ChangeValue(int32 InValue);
 
+	EAttribute GetType()const { return Type; }
+	UAttributes* GetOwningAttributes()const { return OwningAttributes; }
+
 	FOnAttributeChange OnAttributeChange;
+
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	int32 Value = 10;
@@ -41,4 +39,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	FText Name;
+
+	UPROPERTY(VisibleInstanceOnly)
+	UAttributes* OwningAttributes;
+
 };

@@ -3,13 +3,14 @@
 
 #include "StatsAndAttributes/PlayerAttribute.h"
 
-UPlayerAttribute* UPlayerAttribute::Create(int32 InValue, FText InName, EAttribute InType)
+UPlayerAttribute* UPlayerAttribute::Create(int32 InValue, FText InName, EAttribute InType, UAttributes* InAttributes)
 {
 	FName AttributeName = MakeUniqueObjectName(GetTransientPackage(), StaticClass(), FName(InName.ToString()));
 
 	UPlayerAttribute* Result = NewObject<UPlayerAttribute>(GetTransientPackage(), AttributeName);
 	Result->Name = InName;
 	Result->Type = InType;
+	Result->OwningAttributes = InAttributes;
 	Result->SetValue(InValue);
 	return Result;
 }
