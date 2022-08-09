@@ -6,10 +6,9 @@
 
 #include "Components/AbilityComponent.h"
 #include "GameFramework/Character.h"
+#include "Utility/RPGEnums.h"
 #include "BaseCharacter.generated.h"
 
-enum class EResource : uint8;
-enum class EStat : uint8;
 class UResource;
 class UStat;
 class UStatCollection;

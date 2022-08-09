@@ -10,6 +10,7 @@
 #include "Components/AbilityComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "UI/HUDWidget.h"
+#include "UI/CharacterOverview/ShowCharacterOverviewWidget.h"
 
 AHackAndSlashPlayerController::AHackAndSlashPlayerController()
 {
@@ -22,16 +23,17 @@ void AHackAndSlashPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AHackAndSlashPlayerController::SetDestination);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AHackAndSlashPlayerController::UnsetDestination);
+	InputComponent->BindAction("ToggleCharacterOverview", IE_Pressed, this, &AHackAndSlashPlayerController::ToggleCharacterOverview);
 }
 
 void AHackAndSlashPlayerController::SetDestination()
 {
-	bIsDestinationSet = true;
+	bDestinationSet = true;
 }
 
 void AHackAndSlashPlayerController::UnsetDestination()
 {
-	bIsDestinationSet = false;
+	bDestinationSet = false;
 	UnsetEnemy();
 }
 
@@ -83,7 +85,7 @@ void AHackAndSlashPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bIsDestinationSet)
+	if (bDestinationSet)
 	{
 		if (Enemy) 
 		{
@@ -107,11 +109,40 @@ void AHackAndSlashPlayerController::Tick(float DeltaSeconds)
 	}
 }
 
+void AHackAndSlashPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
 void AHackAndSlashPlayerController::AbortMove()
 {
 	if (PathFollowingComp)
 	{
 		PathFollowingComp->AbortMove(*GetPawn(), FPathFollowingResultFlags::MovementStop);
+	}
+}
+
+void AHackAndSlashPlayerController::OnCloseWidgetAnimationEnd()
+{
+	OpenedCharacterOverview = nullptr;
+}
+
+void AHackAndSlashPlayerController::ToggleCharacterOverview()
+{
+	if (OpenedCharacterOverview)
+	{
+		OpenedCharacterOverview->Close();
+		OpenedCharacterOverview = nullptr;
+	}
+	else
+	{
+		checkf(IsValid(ShowCharacterOverviewWidgetClass), TEXT("ShowCharacterOverviewWidgetClass is invalid. Set in BP_HackAndSlashPlayerController"))
+
+		OpenedCharacterOverview = CreateWidget<UShowCharacterOverviewWidget>(this, *ShowCharacterOverviewWidgetClass);
+		OpenedCharacterOverview->Init(ControlledCharacter);
+		OpenedCharacterOverview->AddToViewport();
 	}
 }
 

@@ -8,7 +8,6 @@
 #include "StatsAndAttributes/Stat.h"
 #include "PlayerCharacter.generated.h"
 
-enum class EAttribute : uint8;
 class UPlayerAttribute;
 class UAttributes;
 class UAttributesComponent;
@@ -30,6 +29,7 @@ public:
 	virtual void PostInitProperties() override;
 
 	UPlayerAttribute* GetAttribute(EAttribute Attribute)const { return Attributes->Attributes[EnumToInt(Attribute)]; }
+	UAttributes* GetAttributes()const { return Attributes; }
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;

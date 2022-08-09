@@ -39,6 +39,7 @@ bool UAbility::HasAcceptableDistance() const
 
 void UAbility::RunToTarget()
 {
+	// TODO: what if target character dies while player moves toward him?
 	if (TargetCharacter)
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToActor(Owner->GetController(), TargetCharacter);
@@ -51,5 +52,6 @@ void UAbility::RunToTarget()
 
 void UAbility::StopMoving()
 {
+	// move to the same place where moving character is
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(Owner->GetController(), Owner->GetActorLocation());
 }

@@ -4,14 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Utility/RPGEnums.h"
 #include "Resource.generated.h"
-
-UENUM(BlueprintType, Blueprintable)
-enum class EResource : uint8
-{
-	Health UMETA(DisplayName = "Health"),
-	Mana   UMETA(DisplayName = "Mana")
-};
 
 class UStat;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeResource, float);

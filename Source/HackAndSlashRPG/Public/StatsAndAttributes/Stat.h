@@ -4,30 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Utility/RPGEnums.h"
 #include "Stat.generated.h"
-
-UENUM(BlueprintType, Blueprintable)
-enum class EStat : uint8
-{
-	Armor              UMETA(DisplayName = "Armor"),
-	MaxHealth          UMETA(DisplayName = "MaxHealth"),
-	MaxMana            UMETA(DisplayName = "MaxMana"),
-	MinDamage          UMETA(DisplayName = "MinDamage"),
-	MaxDamage          UMETA(DisplayName = "MaxDamage"),
-	DamageMultiplier   UMETA(DisplayName = "DamageMultiplier"),
-	AttackSpeed        UMETA(DisplayName = "AttackSpeed"),
-	MoveSpeed          UMETA(DisplayName = "MoveSpeed"),
-	HealthRegen        UMETA(DisplayName = "HealthRegen"),
-	ManaRegen          UMETA(DisplayName = "ManaRegen")
-
-	
-};
-
-template <typename EnumClass>
-int32 static EnumToInt(EnumClass Enum)
-{
-	return static_cast<int32>(Enum);
-}
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeStat, float);
 
