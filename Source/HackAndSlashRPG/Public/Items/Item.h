@@ -36,12 +36,14 @@ class HACKANDSLASHRPG_API UItem : public UObject
 	GENERATED_BODY()
 public:
 
+	void SetGridCoordinates(FIntPoint Coordinates) { GridCoordinates = Coordinates; }
 
 	FText GetItemName()const { return Name; }
 	FText GetDescription()const { return Description; }
 	UTexture2D* GetImage()const;
 	UStaticMesh* GetMesh()const;
 	FIntPoint GetSize()const { return Size; }
+	FIntPoint GetGridCoordinates()const { return GridCoordinates; }
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance", meta = (AllowPrivateAccess = "true"))
 	FText Name;
@@ -63,6 +65,7 @@ private:
 
 	UPROPERTY()
 	UItemGrid* OwningGrid;
-	UPROPERTY()
-	FIntPoint GridCoordinates;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
+	FIntPoint GridCoordinates = FIntPoint::NoneValue;
 };
