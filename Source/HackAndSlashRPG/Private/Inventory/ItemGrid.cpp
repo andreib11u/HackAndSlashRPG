@@ -29,6 +29,43 @@ UItemGrid* UItemGrid::Create(FIntPoint GridSize)
 	return NewGrid;
 }
 
+void UItemGrid::AddItemAndBroadcast(UItem* Item, FIntPoint Coordinates)
+{
+	AddItemInternal(Item, Coordinates);
+	OnGridChange.Broadcast();
+	OnItemAdded.Broadcast(Item);
+}
+
+bool UItemGrid::AddItem(UItem* Item)
+{
+	FIntPoint FoundCoordinates = FindEmptyAreaCoordinates(Item->GetSize());
+	if (FoundCoordinates != FIntPoint::NoneValue)
+	{
+		AddItemAndBroadcast(Item, FoundCoordinates);
+		return true;
+	}
+	return false;
+}
+
+bool UItemGrid::AddItemAt(UItem* Item, FIntPoint Coordinates)
+{
+	if (IsAreaEmpty(Coordinates, Item->GetSize()))
+	{
+		AddItemAndBroadcast(Item, Coordinates);
+		return true;
+	}
+	return false;
+}
+
+void UItemGrid::RemoveItem(UItem* Item)
+{
+	if (Items.Contains(Item))
+	{
+		FillArea(Item->GetGridCoordinates(), Item->GetSize(), EMPTY_CELL);
+		Items.Remove(Item);
+	}
+}
+
 void UItemGrid::SetCell(FIntPoint Coordinates, uint32 Id)
 {
 	Cells[GetIndex(Coordinates)] = Id;
@@ -89,12 +126,12 @@ bool UItemGrid::IsAreaEmpty(FIntPoint GridCoordinates, FIntPoint ItemSize) const
 	return bResult;
 }
 
+
 void UItemGrid::AddItemInternal(UItem* Item, FIntPoint Coordinates)
 {
 	Items.Add(Item);
 	Item->SetGridCoordinates(Coordinates);
 	FillArea(Coordinates, Item->GetSize(), Item->GetUniqueID());
-	//OnGridChange.Broadcast();
 }
 
 void UItemGrid::RemoveItemInternal(UItem* Item)
@@ -102,5 +139,4 @@ void UItemGrid::RemoveItemInternal(UItem* Item)
 	Items.Remove(Item);
 	Item->SetGridCoordinates(FIntPoint::NoneValue);
 	FillArea(Item->GetGridCoordinates(), Item->GetSize(), EMPTY_CELL);
-	//OnGridChange.Broadcast();
 }

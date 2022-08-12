@@ -10,6 +10,8 @@
 
 class UItem;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGridChange);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, UItem*, AddedItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemoved, UItem*, RemovedItem);
 
 /**
  * Grid space that can contain UItems. Implemented as an array of items
@@ -23,7 +25,28 @@ public:
 	static UItemGrid* Create(FIntPoint GridSize);
 
 	/**
-	 * @brief Set particular cell in a grid with Id
+	 * Add an item at first free location 
+	 * @param Item - item to add
+	 * @return false if there is no free locations
+	 */
+	bool AddItem(UItem* Item);
+
+	/**
+	 * Add an item at specific location
+	 * @param Item - item to add
+	 * @param Coordinates - location
+	 * @return false if item doesn't fit in given coordinates
+	 */
+	bool AddItemAt(UItem* Item, FIntPoint Coordinates);
+
+	/**
+	 * Remove item from the grid if there is one
+	 * @param Item - item to remove
+	 */
+	void RemoveItem(UItem* Item);
+
+	/**
+	 * Set particular cell in a grid with Id
 	 * @param Coordinates - place where to set Id
 	 * @param Id - Id to set
 	 */
@@ -32,26 +55,28 @@ public:
 	/** Fill area in grid with given Id */
 	void FillArea(FIntPoint TopLeftPoint, FIntPoint AreaSize, uint32 Id);
 
-	/**
-	 * @return grid coordinates or FIntPoint::NoneValue if empty area isn't found
-	 */
+	/** @return grid coordinates or FIntPoint::NoneValue if empty area isn't found	*/
 	FIntPoint FindEmptyAreaCoordinates(FIntPoint ItemSize);
 
 	/**
-	 * @brief true if there is no other items or borders in given area
+	 * true if there is no other items or borders in given area
 	 * @param GridCoordinates - Top left point of an item in inventory grid
-	 * @param ItemSize - how much cells to check for an item to fit
+	 * @param ItemSize - how many cells to check for an item to fit
 	 * */
 	bool IsAreaEmpty(FIntPoint GridCoordinates, FIntPoint ItemSize) const;
-
-	void AddItemInternal(UItem* Item, FIntPoint Coordinates);
-	void RemoveItemInternal(UItem* Item);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGridChange OnGridChange;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnItemAdded OnItemAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnItemRemoved OnItemRemoved;
+
 	TArray<UItem*> GetItems()const { return Items; }
 
+private:
 	/** functions for working with one-dimensional array as with two-dimensional and otherwise */
 
 	uint32 GetCell(FIntPoint Coordinates)const { return Cells[GetIndex(Coordinates)]; }
@@ -59,8 +84,12 @@ public:
 	int32 GetColumn(int32 Index)const { return Index % Size.X; }
 	int32 GetRow(int32 Index)const { return Index / Size.X; }
 
-private:
 	void AllocateCells();
+
+	void AddItemAndBroadcast(UItem* Item, FIntPoint Coordinates);
+
+	void AddItemInternal(UItem* Item, FIntPoint Coordinates);
+	void RemoveItemInternal(UItem* Item);
 
 	UPROPERTY(VisibleAnywhere)
 	FIntPoint Size;
