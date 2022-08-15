@@ -50,4 +50,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UAttributes* Attributes;
+
+
 };

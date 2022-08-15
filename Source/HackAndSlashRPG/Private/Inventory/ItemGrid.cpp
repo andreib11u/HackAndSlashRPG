@@ -47,6 +47,37 @@ bool UItemGrid::AddItem(UItem* Item)
 	return false;
 }
 
+bool UItemGrid::AddManyItems(TArray<UItem*> InItems, TArray<UItem*>& OutNotAddedItems)
+{
+	bool bAnyItemAdded = false;
+	bool bAllItemsAdded = true;
+	TArray<UItem*> NotAddedItems;
+
+	for (UItem* Item : InItems)
+	{
+		FIntPoint EmptyArea = FindEmptyAreaCoordinates(Item->GetSize());
+		if (EmptyArea != FIntPoint::NoneValue)
+		{
+			AddItemInternal(Item, EmptyArea);
+			OnItemAdded.Broadcast(Item);
+			NotAddedItems.Add(Item);
+			bAnyItemAdded = true;
+		}
+		else
+		{
+			bAllItemsAdded = false;
+		}
+	}
+
+	if (bAnyItemAdded)
+	{
+		OnGridChange.Broadcast();
+		OutNotAddedItems = NotAddedItems;
+	}
+
+	return bAllItemsAdded;
+}
+
 bool UItemGrid::AddItemAt(UItem* Item, FIntPoint Coordinates)
 {
 	if (IsAreaEmpty(Coordinates, Item->GetSize()))
@@ -57,12 +88,18 @@ bool UItemGrid::AddItemAt(UItem* Item, FIntPoint Coordinates)
 	return false;
 }
 
+void UItemGrid::RemoveItemAndBroadcast(UItem* Item)
+{
+	RemoveItemInternal(Item);
+	OnItemRemoved.Broadcast(Item);
+	OnGridChange.Broadcast();
+}
+
 void UItemGrid::RemoveItem(UItem* Item)
 {
 	if (Items.Contains(Item))
 	{
-		FillArea(Item->GetGridCoordinates(), Item->GetSize(), EMPTY_CELL);
-		Items.Remove(Item);
+		RemoveItemAndBroadcast(Item);
 	}
 }
 

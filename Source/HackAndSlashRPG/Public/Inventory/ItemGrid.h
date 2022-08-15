@@ -6,7 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "ItemGrid.generated.h"
 
-#define EMPTY_CELL 0
+enum { EMPTY_CELL = 0 };
 
 class UItem;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGridChange);
@@ -24,6 +24,8 @@ class HACKANDSLASHRPG_API UItemGrid : public UObject
 public:
 	static UItemGrid* Create(FIntPoint GridSize);
 
+	// TODO: move item in the same grid
+
 	/**
 	 * Add an item at first free location 
 	 * @param Item - item to add
@@ -32,12 +34,21 @@ public:
 	bool AddItem(UItem* Item);
 
 	/**
+	 * Adds an array of items
+	 * @param InItems - Items to add
+	 * @param OutNotAddedItems - return items that are not added
+	 * @return - true if every item added
+	 */
+	bool AddManyItems(TArray<UItem*> InItems, TArray<UItem*>& OutNotAddedItems);
+
+	/**
 	 * Add an item at specific location
 	 * @param Item - item to add
 	 * @param Coordinates - location
 	 * @return false if item doesn't fit in given coordinates
 	 */
 	bool AddItemAt(UItem* Item, FIntPoint Coordinates);
+	void RemoveItemAndBroadcast(UItem* Item);
 
 	/**
 	 * Remove item from the grid if there is one

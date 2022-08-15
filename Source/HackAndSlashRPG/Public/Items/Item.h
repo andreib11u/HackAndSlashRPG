@@ -56,6 +56,7 @@ private:
 	// X - Width; Y - Height
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance", meta = (AllowPrivateAccess = "true"))
 	FIntPoint Size;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stats", meta = (ClampMin = 1, AllowPrivateAccess = "true"))
 	int32 MaxQuantity = 1;
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Stats", meta = (ClampMin = 1, AllowPrivateAccess = "true"))
