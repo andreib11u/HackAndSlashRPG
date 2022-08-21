@@ -36,6 +36,9 @@ class HACKANDSLASHRPG_API UItem : public UObject
 	GENERATED_BODY()
 public:
 
+	static FLinearColor GetColorFromRarity(EItemRarity Rarity);
+	FLinearColor GetBackgroundColor()const { return GetColorFromRarity(Rarity); }
+
 	void SetGridCoordinates(FIntPoint Coordinates) { GridCoordinates = Coordinates; }
 
 	FText GetItemName()const { return Name; }
@@ -63,10 +66,16 @@ private:
 	int32 Quantity = 1;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats", meta = (ClampMin = 0, AllowPrivateAccess = "true"))
 	int32 Price;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
+	EItemRarity Rarity;
 
 	UPROPERTY()
 	UItemGrid* OwningGrid;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
 	FIntPoint GridCoordinates = FIntPoint::NoneValue;
+
+	//TODO: make color depends on rarity in widget
+	//TODO: moving in the same grid
+	//TODO: dropping items
 };

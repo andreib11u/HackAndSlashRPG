@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemWidget.generated.h"
 
+class UBorder;
 class UImage;
 class UItem;
 /**
@@ -24,6 +25,8 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UImage* ItemImage;
+	UPROPERTY(meta = (BindWidget))
+	UBorder* ItemBackground;
 
 	UPROPERTY()
 	UItem* DisplayingItem;
