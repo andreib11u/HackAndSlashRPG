@@ -19,6 +19,7 @@ class HACKANDSLASHRPG_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+
 public:	
 	UInventoryComponent();
 
@@ -33,6 +34,7 @@ public:
 
 	void AddGrid(UItemGrid* Grid) { Grids.Add(Grid); }
 	UItemGrid* GetGridAt(int32 Index) { return Grids[Index]; }
+	UItemGrid* GetDefaultGrid() { return Grids[0]; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,7 +45,7 @@ private:
 	void AddDefaultItems();
 
 	/**	Added to this inventory at the start */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	TArray<UItem*> DefaultItems;
 
 	UPROPERTY(VisibleInstanceOnly)

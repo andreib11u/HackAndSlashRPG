@@ -8,6 +8,7 @@
 #include "StatsAndAttributes/Stat.h"
 #include "PlayerCharacter.generated.h"
 
+class UInventoryComponent;
 class UPlayerAttribute;
 class UAttributes;
 class UAttributesComponent;
@@ -51,5 +52,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UAttributes* Attributes;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UInventoryComponent* Inventory;
 };

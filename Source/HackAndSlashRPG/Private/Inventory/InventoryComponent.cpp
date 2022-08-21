@@ -47,6 +47,7 @@ bool UInventoryComponent::AddManyItems(TArray<UItem*> Items, TArray<UItem*>& Out
 	return true;
 }
 
+
 void UInventoryComponent::RemoveItem(UItem* Item)
 {
 	for (UItemGrid* Grid : Grids)
@@ -63,20 +64,20 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AddDefaultGrid();
 	AddDefaultItems();
-	
 }
 
 void UInventoryComponent::PostInitProperties()
 {
 	Super::PostInitProperties();
-
-	AddDefaultGrid();
+	
 }
 
 void UInventoryComponent::AddDefaultGrid()
 {
 	UItemGrid* DefaultItemGrid = UItemGrid::Create(DefaultGridSize);
+	Grids.Empty();
 	Grids.Add(DefaultItemGrid);
 }
 

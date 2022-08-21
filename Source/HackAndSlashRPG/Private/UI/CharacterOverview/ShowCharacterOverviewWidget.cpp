@@ -13,6 +13,7 @@ void UShowCharacterOverviewWidget::Init(APlayerCharacter* CharacterToDisplay)
 
 void UShowCharacterOverviewWidget::Close()
 {
+	// Play animation and close after the animations ends
 	BindToAnimationFinished(ShowWidget, OnWidgetAnimationChanged);
 	PlayAnimationReverse(ShowWidget);
 }

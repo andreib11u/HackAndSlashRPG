@@ -86,6 +86,7 @@ public:
 	FOnItemRemoved OnItemRemoved;
 
 	TArray<UItem*> GetItems()const { return Items; }
+	FIntPoint GetSize()const { return Size; }
 
 private:
 	/** functions for working with one-dimensional array as with two-dimensional and otherwise */
