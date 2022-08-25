@@ -12,8 +12,27 @@ void UItemWidget::Init(UItem* Item)
 	DisplayingItem = Item;
 
 	ItemImage->SetBrushFromTexture(Item->GetImage());
-	ItemBackground->SetBrushColor(Item->GetBackgroundColor());
+	ItemBackground->SetBrushColor(GetColorFromRarity(Item->GetRarity()));
 }
+
+FLinearColor UItemWidget::GetColorFromRarity(EItemRarity Rarity)
+{
+	switch (Rarity)
+	{
+	case EItemRarity::Common: 
+		return Common;
+	case EItemRarity::Uncommon: 
+		return Uncommon;
+	case EItemRarity::Rare: 
+		return Rare;
+	case EItemRarity::Legendary: 
+		return Legendary;
+	default: 
+		checkNoEntry();
+	}
+	return FLinearColor::Red;
+}
+
 
 void UItemWidget::NativeConstruct()
 {

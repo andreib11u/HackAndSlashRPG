@@ -35,10 +35,6 @@ class HACKANDSLASHRPG_API UItem : public UObject
 {
 	GENERATED_BODY()
 public:
-
-	static FLinearColor GetColorFromRarity(EItemRarity Rarity);
-	FLinearColor GetBackgroundColor()const { return GetColorFromRarity(Rarity); }
-
 	void SetGridCoordinates(FIntPoint Coordinates) { GridCoordinates = Coordinates; }
 
 	FText GetItemName()const { return Name; }
@@ -47,6 +43,7 @@ public:
 	UStaticMesh* GetMesh()const;
 	FIntPoint GetSize()const { return Size; }
 	FIntPoint GetGridCoordinates()const { return GridCoordinates; }
+	EItemRarity GetRarity()const { return Rarity; }
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance", meta = (AllowPrivateAccess = "true"))
 	FText Name;

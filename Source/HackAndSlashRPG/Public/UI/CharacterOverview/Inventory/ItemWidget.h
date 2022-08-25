@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemWidget.generated.h"
 
+enum class EItemRarity : uint8;
 class UBorder;
 class UImage;
 class UItem;
@@ -19,6 +20,8 @@ class HACKANDSLASHRPG_API UItemWidget : public UUserWidget
 public:
 	void Init(UItem* Item);
 
+	FLinearColor GetColorFromRarity(EItemRarity Rarity);
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -30,4 +33,16 @@ private:
 
 	UPROPERTY()
 	UItem* DisplayingItem;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	FLinearColor Common;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	FLinearColor Uncommon;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	FLinearColor Rare;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	FLinearColor Legendary;
 };
