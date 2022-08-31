@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemWidget.generated.h"
 
+class UItemDragWidget;
 enum class EItemRarity : uint8;
 class UBorder;
 class UImage;
@@ -20,10 +21,14 @@ class HACKANDSLASHRPG_API UItemWidget : public UUserWidget
 public:
 	void Init(UItem* Item);
 
-	FLinearColor GetColorFromRarity(EItemRarity Rarity);
+	FLinearColor GetColorFromRarity(EItemRarity Rarity) const;
+
+	static constexpr float GetCellSize() { return 60.f; }
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -45,4 +50,7 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	FLinearColor Legendary;
+
+	UPROPERTY(EditAnywhere, Category = "Default Classes", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UItemDragWidget> ItemDragWidgetClass;
 };

@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Utility/RPGEnums.h"
 #include "Item.generated.h"
 
 UENUM(BlueprintType)
-enum class EItemState : uint8
+enum class EItemDisposition : uint8
 {
 	None UMETA(DisplayName = "None"),
-	Inventory UMETA(DisplayName = "Inventory"),
-	Equipment UMETA(DisplayName = "Equipment"),
-	Mesh UMETA(DisplayName = "Mesh")
+	Grid UMETA(DisplayName = "Grid"),
+	EquipmentSlot UMETA(DisplayName = "EquipmentSlot"),
+	PickupMesh UMETA(DisplayName = "PickupMesh")
 };
 
 UENUM(BlueprintType)
@@ -36,6 +37,8 @@ class HACKANDSLASHRPG_API UItem : public UObject
 	GENERATED_BODY()
 public:
 	void SetGridCoordinates(FIntPoint Coordinates) { GridCoordinates = Coordinates; }
+	void SetItemDisposition(EItemDisposition Disposition) { ItemDisposition = Disposition; }
+	void SetOwningGrid(UItemGrid* Grid) { OwningGrid = Grid; }
 
 	FText GetItemName()const { return Name; }
 	FText GetDescription()const { return Description; }
@@ -44,6 +47,9 @@ public:
 	FIntPoint GetSize()const { return Size; }
 	FIntPoint GetGridCoordinates()const { return GridCoordinates; }
 	EItemRarity GetRarity()const { return Rarity; }
+	UItemGrid* GetOwningGrid()const { return OwningGrid; }
+	EItemDisposition GetItemDisposition()const { return ItemDisposition; }
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance", meta = (AllowPrivateAccess = "true"))
 	FText Name;
@@ -66,13 +72,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	EItemRarity Rarity;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	EItemDisposition ItemDisposition;
+
 	UPROPERTY()
 	UItemGrid* OwningGrid;
-
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
 	FIntPoint GridCoordinates = FIntPoint::NoneValue;
 
-	//TODO: make color depends on rarity in widget
 	//TODO: moving in the same grid
 	//TODO: dropping items
 };

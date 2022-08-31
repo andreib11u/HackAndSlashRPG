@@ -163,11 +163,12 @@ bool UItemGrid::IsAreaEmpty(FIntPoint GridCoordinates, FIntPoint ItemSize) const
 	return bResult;
 }
 
-
 void UItemGrid::AddItemInternal(UItem* Item, FIntPoint Coordinates)
 {
 	Items.Add(Item);
 	Item->SetGridCoordinates(Coordinates);
+	Item->SetItemDisposition(EItemDisposition::Grid);
+	Item->SetOwningGrid(this);
 	FillArea(Coordinates, Item->GetSize(), Item->GetUniqueID());
 }
 
@@ -175,5 +176,7 @@ void UItemGrid::RemoveItemInternal(UItem* Item)
 {
 	Items.Remove(Item);
 	Item->SetGridCoordinates(FIntPoint::NoneValue);
+	Item->SetItemDisposition(EItemDisposition::None);
+	Item->SetOwningGrid(nullptr);
 	FillArea(Item->GetGridCoordinates(), Item->GetSize(), EMPTY_CELL);
 }

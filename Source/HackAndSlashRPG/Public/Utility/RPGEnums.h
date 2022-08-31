@@ -51,3 +51,9 @@ enum class EResource : uint8
 	Mana   UMETA(DisplayName = "Mana")
 };
 
+UENUM(BlueprintType)
+enum class EItemStorage : uint8
+{
+	Grid UMETA(DisplayName = "Grid"),
+	EquipmentSlot UMETA(DisplayName = "EquipmentSlot")
+};

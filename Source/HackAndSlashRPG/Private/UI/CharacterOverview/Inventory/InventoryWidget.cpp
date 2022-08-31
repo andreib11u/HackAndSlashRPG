@@ -9,7 +9,7 @@
 #include "Components/UniformGridPanel.h"
 #include "Inventory/ItemGrid.h"
 #include "Items/Item.h"
-#include "UI/CharacterOverview/Inventory/ItemWidget.h"
+#include "UI/CharacterOverview/Inventory/Item/ItemWidget.h"
 
 void UInventoryWidget::CreateGrid(FIntPoint Size)
 {
