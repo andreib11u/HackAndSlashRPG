@@ -47,6 +47,49 @@ bool UItemGrid::AddItem(UItem* Item)
 	return false;
 }
 
+bool UItemGrid::CanAddItemAt(UItem* Item, FIntPoint Coordinates)
+{
+	//TODO: handle stacking
+	return IsAreaEmpty(Coordinates, Item->GetSize());
+}
+
+bool UItemGrid::CanAddItem(UItem* Item)
+{
+	//TODO: handle stacking
+	return FindEmptyAreaCoordinates(Item->GetSize()) != FIntPoint::NoneValue;
+}
+
+void UItemGrid::StartDraggingItem(UItem* Item)
+{
+	DraggingItem = Item;
+	FillArea(DraggingItem->GetGridCoordinates(), DraggingItem->GetSize(), EMPTY_CELL);
+	OnGridChange.Broadcast();
+}
+
+void UItemGrid::CancelDraggingItem()
+{
+	FillArea(DraggingItem->GetGridCoordinates(), DraggingItem->GetSize(), DraggingItem->GetUniqueID());
+	DraggingItem = nullptr;
+	OnGridChange.Broadcast();
+}
+
+void UItemGrid::FinishDraggingItemOutOfGrid()
+{
+	if (DraggingItem)
+	{
+		Items.Remove(DraggingItem);
+		DraggingItem = nullptr;
+	}
+}
+
+void UItemGrid::MoveDraggingItemInSameGrid(FIntPoint Coordinates)
+{
+	FillArea(Coordinates, DraggingItem->GetSize(), DraggingItem->GetUniqueID());
+	DraggingItem->SetGridCoordinates(Coordinates);
+	DraggingItem = nullptr;
+	OnGridChange.Broadcast();
+}
+
 bool UItemGrid::AddManyItems(TArray<UItem*> InItems, TArray<UItem*>& OutNotAddedItems)
 {
 	bool bAnyItemAdded = false;
@@ -180,3 +223,4 @@ void UItemGrid::RemoveItemInternal(UItem* Item)
 	Item->SetOwningGrid(nullptr);
 	FillArea(Item->GetGridCoordinates(), Item->GetSize(), EMPTY_CELL);
 }
+

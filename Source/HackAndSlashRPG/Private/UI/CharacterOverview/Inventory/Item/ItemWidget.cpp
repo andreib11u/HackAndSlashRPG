@@ -5,6 +5,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
+#include "Inventory/ItemGrid.h"
 #include "Items/Item.h"
 #include "UI/CharacterOverview/Inventory/Item/ItemDragDropOperation.h"
 #include "UI/CharacterOverview/Inventory/Item/ItemDragWidget.h"
@@ -16,7 +17,6 @@ void UItemWidget::Init(UItem* Item)
 	ItemImage->SetBrushFromTexture(Item->GetImage());
 	ItemBackground->SetBrushColor(GetColorFromRarity(Item->GetRarity()));
 }
-
 
 FLinearColor UItemWidget::GetColorFromRarity(EItemRarity Rarity) const
 {
@@ -35,7 +35,6 @@ FLinearColor UItemWidget::GetColorFromRarity(EItemRarity Rarity) const
 	}
 	return FLinearColor::Red;
 }
-
 
 void UItemWidget::NativeConstruct()
 {
@@ -68,6 +67,9 @@ void UItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPoint
 	ItemOp->DefaultDragVisual = ItemDragWidget;
 
 	ItemOp->Item = DisplayingItem;
+
+	UItemGrid* ItemGrid = DisplayingItem->GetOwningGrid();
+	ItemGrid->StartDraggingItem(DisplayingItem);
 
 	OutOperation = ItemOp;
 }

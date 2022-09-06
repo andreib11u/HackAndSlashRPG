@@ -24,14 +24,33 @@ class HACKANDSLASHRPG_API UItemGrid : public UObject
 public:
 	static UItemGrid* Create(FIntPoint GridSize);
 
-	// TODO: move item in the same grid
-
 	/**
 	 * Add an item at first free location 
 	 * @param Item - item to add
 	 * @return false if there is no free locations
 	 */
 	bool AddItem(UItem* Item);
+
+	/**
+	 * Asks if item can be added at certain coordinates
+	 * @param Item - item to add
+	 * @param Coordinates - coordinates to add item to
+	 * @return whether grid can place the item or not
+	 */
+	bool CanAddItemAt(UItem* Item, FIntPoint Coordinates);
+
+	/**
+	 * Asks if there is a place for an item in the grid
+	 * @param Item - item to add
+	 * @return true if place is found
+	 * @note probably don't need this function
+	 */
+	bool CanAddItem(UItem* Item);
+
+	void StartDraggingItem(UItem* Item);
+	void CancelDraggingItem();
+	void FinishDraggingItemOutOfGrid();
+	void MoveDraggingItemInSameGrid(FIntPoint Coordinates);
 
 	/**
 	 * Adds an array of items
@@ -48,7 +67,6 @@ public:
 	 * @return false if item doesn't fit in given coordinates
 	 */
 	bool AddItemAt(UItem* Item, FIntPoint Coordinates);
-	void RemoveItemAndBroadcast(UItem* Item);
 
 	/**
 	 * Remove item from the grid if there is one
@@ -99,6 +117,7 @@ private:
 	void AllocateCells();
 
 	void AddItemAndBroadcast(UItem* Item, FIntPoint Coordinates);
+	void RemoveItemAndBroadcast(UItem* Item);
 
 	void AddItemInternal(UItem* Item, FIntPoint Coordinates);
 	void RemoveItemInternal(UItem* Item);
@@ -111,4 +130,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<uint32> Cells;
+
+	UPROPERTY()
+	UItem* DraggingItem;
 };

@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Item/ItemDragDropOperation.h"
 #include "InventoryWidget.generated.h"
 
+class UItemHintWidget;
 class UItemWidget;
 class UItem;
 class UUniformGridPanel;
@@ -23,6 +25,10 @@ class HACKANDSLASHRPG_API UInventoryWidget : public UUserWidget
 public:
 	void Init(UItemGrid* ItemGrid);
 
+protected:
+	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -32,11 +38,25 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* GridCanvas;
 
+	UPROPERTY()
+	TArray<UItemWidget*> ItemWidgets;
+
+	UPROPERTY()
+	UItemHintWidget* Hint;
+
 	UFUNCTION()
 	void OnItemGridUpdate();
 
 	void CreateGrid(FIntPoint Size);
 	void CreateItemWidgets(const TArray<UItem*>& Items);
+	void RemoveItemWidgets();
+
+	FIntPoint GetGridCoordinatesFromDraggedItem(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UItemDragDropOperation* ItemDragDropOp);
+	FIntPoint LocalToGrid(FVector2D LocalPosition);
+	bool IsDraggedItemInBorders(FIntPoint InventoryCoordinates, FIntPoint ItemSize);
+
+	void ShowItemHint(FIntPoint Coordinates, FIntPoint ItemSize, FLinearColor Color);
+	void RemoveHint();
 
 	UPROPERTY()
 	UItemGrid* DisplayingGrid;
@@ -48,4 +68,8 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UItemWidget> ItemWidgetClass;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UItemHintWidget> ItemHintWidgetClass;
 };
+
