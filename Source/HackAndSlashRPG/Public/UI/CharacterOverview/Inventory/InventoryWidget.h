@@ -53,7 +53,7 @@ private:
 
 	FIntPoint GetGridCoordinatesFromDraggedItem(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UItemDragDropOperation* ItemDragDropOp);
 	FIntPoint LocalToGrid(FVector2D LocalPosition);
-	bool IsDraggedItemInBorders(FIntPoint InventoryCoordinates, FIntPoint ItemSize);
+	bool IsDraggedItemInBorders(FIntPoint GridCoordinates, FIntPoint ItemSize);
 
 	void ShowItemHint(FIntPoint Coordinates, FIntPoint ItemSize, FLinearColor Color);
 	void RemoveHint();

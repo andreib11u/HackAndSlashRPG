@@ -15,3 +15,9 @@ void UCharacterOverviewWidget::Init(APlayerCharacter* CharacterToDisplay)
 	UInventoryComponent* PlayerInventory = CharacterToDisplay->FindComponentByClass<UInventoryComponent>();
 	Inventory->Init(PlayerInventory->GetDefaultGrid());
 }
+
+FReply UCharacterOverviewWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply::Handled();
+}
+

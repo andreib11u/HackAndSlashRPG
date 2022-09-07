@@ -47,11 +47,6 @@ public:
 	 */
 	bool CanAddItem(UItem* Item);
 
-	void StartDraggingItem(UItem* Item);
-	void CancelDraggingItem();
-	void FinishDraggingItemOutOfGrid();
-	void MoveDraggingItemInSameGrid(FIntPoint Coordinates);
-
 	/**
 	 * Adds an array of items
 	 * @param InItems - Items to add
@@ -93,6 +88,15 @@ public:
 	 * @param ItemSize - how many cells to check for an item to fit
 	 * */
 	bool IsAreaEmpty(FIntPoint GridCoordinates, FIntPoint ItemSize) const;
+
+	/** Called when item drag detected. Removes item from grid visually */
+	void StartDraggingItem(UItem* Item);
+	/** Called when drag failed. Puts item back into the grid*/
+	void CancelDraggingItem();
+	/** Called when dragged item dropped not into the same grid. Removes dragged item completely */
+	void FinishDraggingItemOutOfGrid();
+	/** Called when dragged item dropped into the same grid. Changes dragged item's coordinates */
+	void MoveDraggingItemInSameGrid(FIntPoint Coordinates);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGridChange OnGridChange;

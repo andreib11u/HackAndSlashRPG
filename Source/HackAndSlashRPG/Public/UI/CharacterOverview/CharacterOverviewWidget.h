@@ -20,6 +20,8 @@ class HACKANDSLASHRPG_API UCharacterOverviewWidget : public UUserWidget
 public:
 	void Init(APlayerCharacter* CharacterToDisplay);
 
+protected:
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 private:
 	UPROPERTY(meta = (BindWidget))
 	UAttributesWidget* Attributes;

@@ -113,6 +113,10 @@ bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 				DisplayingGrid->MoveDraggingItemInSameGrid(Coordinates);
 			}
 		}
+		else
+		{
+			ItemOp->Item->GetOwningGrid()->CancelDraggingItem();
+		}
 	}
 
 	return true;
@@ -147,11 +151,11 @@ FIntPoint UInventoryWidget::LocalToGrid(FVector2D LocalPosition)
 	return Result;
 }
 
-bool UInventoryWidget::IsDraggedItemInBorders(FIntPoint InventoryCoordinates, FIntPoint ItemSize)
+bool UInventoryWidget::IsDraggedItemInBorders(FIntPoint GridCoordinates, FIntPoint ItemSize)
 {
-	return InventoryCoordinates.X >= 0 && InventoryCoordinates.Y >= 0 &&
-		InventoryCoordinates.X + ItemSize.X <= DisplayingGrid->GetSize().X &&
-		InventoryCoordinates.Y + ItemSize.Y <= DisplayingGrid->GetSize().Y;
+	return GridCoordinates.X >= 0 && GridCoordinates.Y >= 0 &&
+		GridCoordinates.X + ItemSize.X <= DisplayingGrid->GetSize().X &&
+		GridCoordinates.Y + ItemSize.Y <= DisplayingGrid->GetSize().Y;
 }
 
 void UInventoryWidget::ShowItemHint(FIntPoint Coordinates, FIntPoint ItemSize, FLinearColor Color)
